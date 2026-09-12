@@ -51,13 +51,13 @@ Ordem inegociável: **estrutura pura → testes unitários → endpoint → test
 A stack abaixo é definitiva para a v1. Nenhuma dependência fora desta lista é adicionada
 sem discussão explícita e atualização da spec:
 
-| Camada    | Tecnologia                                  |
-| --------- | ------------------------------------------- |
-| Frontend  | Next.js 14+ App Router · TypeScript · Tailwind CSS |
-| Backend   | Django 5+ · Django REST Framework           |
-| Testes    | pytest (backend) · vitest (frontend)        |
-| Python    | 3.14.7 via pyenv                            |
-| Deploy    | Vercel (frontend) · Render (backend)        |
+| Camada   | Tecnologia                                         |
+| -------- | -------------------------------------------------- |
+| Frontend | Next.js 14+ App Router · TypeScript · Tailwind CSS |
+| Backend  | Django 5+ · Django REST Framework                  |
+| Testes   | pytest (backend) · vitest (frontend)               |
+| Python   | 3.14.7 via pyenv                                   |
+| Deploy   | Vercel (frontend) · Render (backend)               |
 
 ## Restrições de Infraestrutura
 
