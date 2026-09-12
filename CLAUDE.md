@@ -49,6 +49,23 @@ frontend/
 
 ---
 
+## Setup inicial (uma vez)
+
+```bash
+# Backend — criar e ativar virtualenv
+python -m venv backend/.venv
+source backend/.venv/bin/activate
+pip install -r backend/requirements.txt
+
+# Frontend
+cd frontend && npm install
+```
+
+O `.venv` já está no `.gitignore`. Sempre ativar com `source backend/.venv/bin/activate`
+antes de rodar o servidor Django ou os testes pytest.
+
+---
+
 ## Padrões de código
 
 ### Backend (Python)
