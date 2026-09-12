@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+*.env
+!.env.example
+
+# Django
+*.sqlite3
+staticfiles/
+mediafiles/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+.npm
+
+# Env files
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
+
+# IDEs
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Spec Kit (drafts locais que não devem ir pro repo)
+.specify/memory/.draft-*
