@@ -32,10 +32,6 @@ class Stack(Generic[T]):
         return list(self._items)
 
 
-# ---------------------------------------------------------------------------
-# Tipos de dados da simulação
-# ---------------------------------------------------------------------------
-
 type FrameDict = dict[str, object]
 type EventoDict = dict[str, object]
 
@@ -56,10 +52,6 @@ def _make_evento(
 ) -> EventoDict:
     return {"tipo": tipo, "frame": frame, "pilha_estado": list(pilha_estado)}
 
-
-# ---------------------------------------------------------------------------
-# Simuladores
-# ---------------------------------------------------------------------------
 
 def _simular_fatorial(
     n: int, pilha: Stack[FrameDict], eventos: list[EventoDict]
@@ -115,10 +107,6 @@ def _simular_fibonacci(
     eventos.append(_make_evento("pop", frame_pop, pilha.snapshot()))
     return resultado
 
-
-# ---------------------------------------------------------------------------
-# Ponto de entrada público
-# ---------------------------------------------------------------------------
 
 def simular_pilha(
     funcao: str, valor: int, max_depth: int = MAX_DEPTH

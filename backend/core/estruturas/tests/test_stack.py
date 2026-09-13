@@ -2,10 +2,6 @@ import pytest
 from core.estruturas.stack import Stack, simular_pilha
 
 
-# ---------------------------------------------------------------------------
-# Testes da classe Stack
-# ---------------------------------------------------------------------------
-
 def test_push_aumenta_tamanho() -> None:
     s: Stack[int] = Stack()
     s.push(1)
@@ -41,10 +37,6 @@ def test_pop_em_pilha_vazia_levanta_excecao() -> None:
         s.pop()
 
 
-# ---------------------------------------------------------------------------
-# Testes de simular_pilha — fatorial
-# ---------------------------------------------------------------------------
-
 def test_fatorial_4_gera_8_eventos() -> None:
     result = simular_pilha("fatorial", 4)
     assert result["status"] == "completo"
@@ -69,10 +61,6 @@ def test_fatorial_1_gera_2_eventos() -> None:
     assert result["frames"][1]["tipo"] == "pop"
 
 
-# ---------------------------------------------------------------------------
-# Testes de simular_pilha — fibonacci
-# ---------------------------------------------------------------------------
-
 def test_fibonacci_5_tem_chamadas_duplicadas() -> None:
     result = simular_pilha("fibonacci", 5)
     assert result["status"] == "completo"
@@ -87,10 +75,6 @@ def test_fibonacci_1_retorna_1() -> None:
     assert pops[-1]["frame"]["retorno"] == 1
 
 
-# ---------------------------------------------------------------------------
-# Testes de overflow
-# ---------------------------------------------------------------------------
-
 def test_overflow_emitido_apos_max_depth() -> None:
     result = simular_pilha("fibonacci", 100, max_depth=10)
     assert result["status"] == "overflow"
@@ -102,10 +86,6 @@ def test_pilha_estado_vazia_apos_overflow_no_final() -> None:
     result = simular_pilha("fibonacci", 100, max_depth=5)
     assert result["status"] == "overflow"
 
-
-# ---------------------------------------------------------------------------
-# Testes de validação de entrada
-# ---------------------------------------------------------------------------
 
 def test_valor_invalido_levanta_value_error() -> None:
     with pytest.raises(ValueError):

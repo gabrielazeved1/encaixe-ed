@@ -16,6 +16,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "apps.pilha",
+    "apps.escalonador",
+    "apps.roteamento",
+    "apps.graus_separacao",
+    "apps.busca_hash",
+    "apps.indice_bst",
+    "apps.alocador_memoria",
 ]
 
 MIDDLEWARE = [

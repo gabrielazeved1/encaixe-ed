@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Navbar } from "@/components/ui/Navbar";
 
 export const metadata: Metadata = {
   title: "Encaixe — Estruturas de Dados em Ação",
@@ -14,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className="min-h-screen bg-gray-950 text-gray-100">{children}</body>
+      <body className="min-h-screen bg-[#0d1117] text-white">
+        <Navbar />
+        <div className="pt-16">{children}</div>
+      </body>
     </html>
   );
 }
