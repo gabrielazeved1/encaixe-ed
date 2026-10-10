@@ -192,6 +192,11 @@ export function BuscaHashVisual({ passos, resumo, chave }: Props) {
           onAvancar={player.avancar}
           onVoltar={player.voltar}
           onResetar={player.resetar}
+          tocando={player.tocando}
+          velocidade={player.velocidade}
+          onTocar={player.tocar}
+          onPausar={player.pausar}
+          onMudarVelocidade={player.setVelocidade}
         />
       </div>
 

@@ -131,10 +131,10 @@ description: "Lista de tasks ordenada para a feature 002-step-by-step-visualizac
 
 **Independent Test**: Cenário 4 do `quickstart.md` — `useStepPlayer` auto-avança com `setTimeout` e troca de velocidade afeta próximo intervalo.
 
-- [ ] T034 [US2] Estender `frontend/hooks/useStepPlayer.ts` com estado `{ tocando: boolean, velocidade: number }` e handlers `tocar()`, `pausar()`, `setVelocidade(v)`. Enquanto `tocando` e `indice < totalPassos-1`, agendar `setTimeout(() => avancar(), INTERVALO_BASE / velocidade)`. Ao atingir fim, `tocando = false` (FR-009). Limpar timeout no `useEffect` cleanup para evitar leak
-- [ ] T035 [P] [US2] Estender `frontend/hooks/__tests__/useStepPlayer.test.ts` cobrindo: `tocar()` + fake timers avança o índice; `pausar()` para a progressão; mudar velocidade enquanto toca afeta o próximo intervalo (não o atual); ao atingir último passo em autoplay, `tocando` volta a `false`
-- [ ] T036 [US2] Estender `frontend/components/ui/StepControls.tsx` com botão play/pause (troca de ícone conforme `tocando`) e slider/toggle de velocidade com no mínimo 3 opções (0.5×, 1×, 2×) — FR-005. Botão play desabilitado quando `indice === totalPassos - 1`
-- [ ] T037 [P] [US2] Estender `frontend/components/ui/__tests__/StepControls.test.tsx` validando: ícone muda entre play/pause conforme prop; clicar play chama handler certo; mudar slider chama `setVelocidade` com valor correto
+- [x] T034 [US2] Estender `frontend/hooks/useStepPlayer.ts` com estado `{ tocando: boolean, velocidade: number }` e handlers `tocar()`, `pausar()`, `setVelocidade(v)`. Enquanto `tocando` e `indice < totalPassos-1`, agendar `setTimeout(() => avancar(), INTERVALO_BASE / velocidade)`. Ao atingir fim, `tocando = false` (FR-009). Limpar timeout no `useEffect` cleanup para evitar leak
+- [x] T035 [P] [US2] Estender `frontend/hooks/__tests__/useStepPlayer.test.ts` cobrindo: `tocar()` + fake timers avança o índice; `pausar()` para a progressão; mudar velocidade enquanto toca afeta o próximo intervalo (não o atual); ao atingir último passo em autoplay, `tocando` volta a `false`
+- [x] T036 [US2] Estender `frontend/components/ui/StepControls.tsx` com botão play/pause (troca de ícone conforme `tocando`) e slider/toggle de velocidade com no mínimo 3 opções (0.5×, 1×, 2×) — FR-005. Botão play desabilitado quando `indice === totalPassos - 1`
+- [x] T037 [P] [US2] Estender `frontend/components/ui/__tests__/StepControls.test.tsx` validando: ícone muda entre play/pause conforme prop; clicar play chama handler certo; mudar slider chama `setVelocidade` com valor correto
 
 **Checkpoint**: US2 entregue nos três projetos simultaneamente — nenhum visual precisou mudar porque o novo botão vive no `StepControls` compartilhado.
 

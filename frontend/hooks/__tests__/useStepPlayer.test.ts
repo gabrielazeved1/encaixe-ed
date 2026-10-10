@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useStepPlayer } from "@/hooks/useStepPlayer";
 import type { Passo } from "@/types/passos";
@@ -98,5 +98,78 @@ describe("useStepPlayer", () => {
     expect(result.current.totalPassos).toBe(0);
     expect(result.current.podeAvancar).toBe(false);
     expect(result.current.podeVoltar).toBe(false);
+  });
+
+  describe("autoplay (US2)", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("tocar faz o indice avançar com o passar do tempo", () => {
+      const passos = fazerPassos(4);
+      const { result } = renderHook(() => useStepPlayer(passos));
+
+      act(() => result.current.tocar());
+      expect(result.current.tocando).toBe(true);
+
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+      expect(result.current.indice).toBe(1);
+
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+      expect(result.current.indice).toBe(2);
+    });
+
+    it("pausar interrompe a progressão", () => {
+      const passos = fazerPassos(4);
+      const { result } = renderHook(() => useStepPlayer(passos));
+
+      act(() => result.current.tocar());
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+      expect(result.current.indice).toBe(1);
+
+      act(() => result.current.pausar());
+      expect(result.current.tocando).toBe(false);
+
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(result.current.indice).toBe(1);
+    });
+
+    it("velocidade maior encurta o intervalo", () => {
+      const passos = fazerPassos(4);
+      const { result } = renderHook(() => useStepPlayer(passos));
+
+      act(() => result.current.setVelocidade(2));
+      act(() => result.current.tocar());
+
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+      expect(result.current.indice).toBe(1);
+    });
+
+    it("ao atingir o último passo em autoplay, tocando volta a false", () => {
+      const passos = fazerPassos(2);
+      const { result } = renderHook(() => useStepPlayer(passos));
+
+      act(() => result.current.tocar());
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+
+      expect(result.current.indice).toBe(1);
+      expect(result.current.tocando).toBe(false);
+    });
   });
 });
