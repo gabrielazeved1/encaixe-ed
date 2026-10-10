@@ -8,4 +8,5 @@ urlpatterns = [
     path("api/hash/", include("apps.busca_hash.urls")),
     path("api/bst/", include("apps.indice_bst.urls")),
     path("api/memoria/", include("apps.alocador_memoria.urls")),
+    path("api/jogo_adivinhe/", include("apps.jogo_adivinhe.urls")),
 ]

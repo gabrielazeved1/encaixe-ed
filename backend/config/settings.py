@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "apps.busca_hash",
     "apps.indice_bst",
     "apps.alocador_memoria",
+    "apps.jogo_adivinhe",
 ]
 
 MIDDLEWARE = [
