@@ -55,7 +55,7 @@ export function EscalonadorDemo() {
       duracao: parseInt(l.duracao, 10) || 1,
       prioridade: parseInt(l.prioridade, 10) || 5,
     }));
-    const q = algoritmo === "round-robin" ? parseInt(quantum, 10) || 4 : undefined;
+    const q = parseInt(quantum, 10) || 4;
     await simular(processos, algoritmo, q);
   }
 
@@ -139,16 +139,14 @@ export function EscalonadorDemo() {
             <option value="round-robin">round-robin</option>
             <option value="prioridade">prioridade</option>
           </select>
-          {algoritmo === "round-robin" && (
-            <input
-              type="number"
-              min={1}
-              value={quantum}
-              onChange={(e) => setQuantum(e.target.value)}
-              className="bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm w-24 focus:outline-none focus:border-green-500"
-              placeholder="quantum"
-            />
-          )}
+          <input
+            type="number"
+            min={1}
+            value={quantum}
+            onChange={(e) => setQuantum(e.target.value)}
+            className="bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm w-24 focus:outline-none focus:border-green-500"
+            placeholder="quantum"
+          />
           <button
             type="submit"
             disabled={loading}
