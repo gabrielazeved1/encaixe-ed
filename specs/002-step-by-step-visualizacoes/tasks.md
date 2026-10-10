@@ -144,11 +144,11 @@ description: "Lista de tasks ordenada para a feature 002-step-by-step-visualizac
 
 **Purpose**: acabamentos e validação final.
 
-- [ ] T038 [P] Rodar `pytest` completo (`source backend/.venv/bin/activate && pytest`) e garantir que nenhum dos quatro projetos não migrados quebrou
-- [ ] T039 [P] Rodar `npm run test` e `npm run lint` no frontend; corrigir warnings do strict mode
+- [x] T038 [P] Rodar `pytest` completo (`source backend/.venv/bin/activate && pytest`) e garantir que nenhum dos quatro projetos não migrados quebrou
+- [x] T039 [P] Rodar `npm run test` e `npm run lint` no frontend; corrigir warnings do strict mode
 - [ ] T040 Executar manualmente os cinco cenários do `quickstart.md` em `npm run dev` e marcar cada checkbox do "Done When"
-- [ ] T041 [P] Atualizar `frontend/content/projetos.ts` nos três projetos para incluir, no `textoEd`, uma frase explicando que a visualização suporta modo step-by-step (nada de inline em componente — Princípio V)
-- [ ] T042 Atualizar `README.md` com uma linha mencionando a nova capacidade (seção de features, se existir)
+- [x] T041 [P] Atualizar `frontend/content/projetos.ts` nos três projetos para incluir, no `textoEd`, uma frase explicando que a visualização suporta modo step-by-step (nada de inline em componente — Princípio V)
+- [x] T042 Atualizar `README.md` com uma linha mencionando a nova capacidade (seção de features, se existir)
 
 ---
 

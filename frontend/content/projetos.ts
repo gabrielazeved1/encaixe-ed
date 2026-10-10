@@ -95,7 +95,9 @@ export const projetos: Projeto[] = [
 
 A pilha tem limite de 50 frames. Se você pedir fibonacci(51), ela estoura — e você verá o evento "overflow" acontecer em tempo real.
 
-No dia a dia: toda linguagem de programação tem uma call stack exatamente assim. O stack trace que aparece quando um programa lança uma exceção é essa pilha sendo impressa. Python, Java, JavaScript — todos usam esse mecanismo. Em Sistemas Operacionais você vai ver que o SO aloca uma região de memória chamada stack para cada thread, com tamanho limitado (tipicamente 1–8 MB).`,
+No dia a dia: toda linguagem de programação tem uma call stack exatamente assim. O stack trace que aparece quando um programa lança uma exceção é essa pilha sendo impressa. Python, Java, JavaScript — todos usam esse mecanismo. Em Sistemas Operacionais você vai ver que o SO aloca uma região de memória chamada stack para cada thread, com tamanho limitado (tipicamente 1–8 MB).
+
+A visualização aqui funciona em modo passo-a-passo: dispare uma simulação e navegue manualmente ou use o autoplay para ver cada push e pop com descrição em linguagem natural.`,
   },
   {
     slug: "escalonador",
@@ -206,7 +208,9 @@ No dia a dia: LinkedIn mostra "2º grau" ou "3º grau" usando BFS sobre o grafo 
 
 A função hash usada é polynomial rolling hash — multiplica cada caractere pela sua posição e tira o módulo pelo tamanho da tabela. Colisões são resolvidas por encadeamento (chaining): o bucket vira uma lista. Daí por que às vezes o hash precisa de mais de 1 comparação.
 
-No dia a dia: índices hash do PostgreSQL funcionam exatamente assim para buscas por igualdade exata (WHERE id = 42). Dicionários do Python e objetos do JavaScript são hash tables por baixo. Quando você acessa dados em O(1) em qualquer dessas linguagens, é esse mecanismo rodando.`,
+No dia a dia: índices hash do PostgreSQL funcionam exatamente assim para buscas por igualdade exata (WHERE id = 42). Dicionários do Python e objetos do JavaScript são hash tables por baixo. Quando você acessa dados em O(1) em qualquer dessas linguagens, é esse mecanismo rodando.
+
+A visualização aqui funciona em modo passo-a-passo: a tabela nasce vazia e cada inserção vai acendendo o bucket alvo — colisões ficam explícitas no narrador lateral. Você pode pausar entre dois passos para inspecionar como a chain cresceu antes da busca começar.`,
     operacoes: [
       "inserir(chave, valor) — insere no bucket hash(chave)",
       "buscar(chave) — acesso O(1) esperado",
@@ -237,7 +241,9 @@ No dia a dia: índices hash do PostgreSQL funcionam exatamente assim para buscas
 
 O resultado mostra lado a lado: quantas comparações a BST precisou vs. uma varredura linear. Para a árvore do exemplo (7 nós balanceados), a BST chega em qualquer valor em no máximo 3 comparações. Linear pode precisar de 7.
 
-No dia a dia: índices B-Tree do PostgreSQL e MySQL são a evolução direta da BST — árvores com múltiplos filhos por nó para reduzir a altura e os acessos a disco. Quando você faz SELECT sem índice, o banco faz varredura linear. Com índice B-Tree, faz busca logarítmica. Em Banco de Dados você vai entender por que criar índices nos campos de busca frequente é uma das otimizações mais importantes.`,
+No dia a dia: índices B-Tree do PostgreSQL e MySQL são a evolução direta da BST — árvores com múltiplos filhos por nó para reduzir a altura e os acessos a disco. Quando você faz SELECT sem índice, o banco faz varredura linear. Com índice B-Tree, faz busca logarítmica. Em Banco de Dados você vai entender por que criar índices nos campos de busca frequente é uma das otimizações mais importantes.
+
+A visualização aqui funciona em modo passo-a-passo: cada inserção e cada comparação da busca viram um passo com descrição em pt-BR. Dá para avançar manualmente ou deixar o autoplay rodar para ver a árvore nascendo nó a nó.`,
     operacoes: [
       "inserir(v) — posiciona mantendo BST property",
       "buscar(v) — O(log n) esperado",
