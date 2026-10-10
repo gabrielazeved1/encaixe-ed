@@ -210,15 +210,26 @@ export type PassoJogo = {
   estado: unknown;
 };
 
+export type Camada = "estrutura" | "operacao" | "complexidade";
+
+export type PerguntaRevelada = {
+  camada: Camada;
+  enunciado: string;
+  alternativas: [string, string, string, string];
+};
+
 export type RodadaResult = {
   token: string;
   passos: PassoJogo[];
+  pergunta_estrutura: PerguntaRevelada;
 };
 
-export type VereditoResult = {
+export type VereditoParcial = {
+  camada: Camada;
   acertou: boolean;
-  estrutura_correta: Estrutura;
+  correto: string;
   explicacao: string;
+  proxima_pergunta: PerguntaRevelada | null;
 };
 
 export async function getRodada(seed?: number): Promise<RodadaResult> {
@@ -235,10 +246,11 @@ export async function getRodada(seed?: number): Promise<RodadaResult> {
 
 export async function postPalpite(
   token: string,
-  palpite: Estrutura
-): Promise<VereditoResult> {
-  return apiFetch<VereditoResult>("/api/jogo_adivinhe/palpite", {
+  estagio: Camada,
+  palpite: string
+): Promise<VereditoParcial> {
+  return apiFetch<VereditoParcial>("/api/jogo_adivinhe/palpite", {
     method: "POST",
-    body: JSON.stringify({ token, palpite }),
+    body: JSON.stringify({ token, estagio, palpite }),
   });
 }

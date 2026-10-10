@@ -4,59 +4,96 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getRodada,
   postPalpite,
-  type Estrutura,
+  type Camada,
+  type PerguntaRevelada,
   type RodadaResult,
-  type VereditoResult,
+  type VereditoParcial,
 } from "@/lib/api";
 
+export type EstadoRodada =
+  | "carregando"
+  | "respondendo"
+  | "veredito"
+  | "erro";
+
 export type UseAdivinheRodadaResult = {
+  estado: EstadoRodada;
   rodada: RodadaResult | null;
-  veredito: VereditoResult | null;
-  carregando: boolean;
+  perguntaAtual: PerguntaRevelada | null;
+  vereditosParciais: VereditoParcial[];
+  pontuacao: 0 | 1 | 2 | 3 | null;
   erro: string | null;
   carregarRodada: (seed?: number) => Promise<void>;
-  enviarPalpite: (palpite: Estrutura) => Promise<void>;
+  enviarPalpite: (palpite: string) => Promise<void>;
+  proximaRodada: () => Promise<void>;
 };
+
+function calcularPontuacao(
+  vereditos: VereditoParcial[]
+): 0 | 1 | 2 | 3 {
+  const acertos = vereditos.filter((v) => v.acertou).length;
+  if (acertos === 0) return 0;
+  if (acertos === 1) return 1;
+  if (acertos === 2) return 2;
+  return 3;
+}
 
 export function useAdivinheRodada(
   seedInicial?: number
 ): UseAdivinheRodadaResult {
+  const [estado, setEstado] = useState<EstadoRodada>("carregando");
   const [rodada, setRodada] = useState<RodadaResult | null>(null);
-  const [veredito, setVeredito] = useState<VereditoResult | null>(null);
-  const [carregando, setCarregando] = useState(false);
+  const [perguntaAtual, setPerguntaAtual] =
+    useState<PerguntaRevelada | null>(null);
+  const [vereditosParciais, setVereditosParciais] = useState<
+    VereditoParcial[]
+  >([]);
+  const [pontuacao, setPontuacao] = useState<0 | 1 | 2 | 3 | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const inicializou = useRef(false);
 
   const carregarRodada = useCallback(async (seed?: number) => {
-    setCarregando(true);
+    setEstado("carregando");
     setErro(null);
-    setVeredito(null);
+    setVereditosParciais([]);
+    setPontuacao(null);
     try {
       const r = await getRodada(seed);
       setRodada(r);
+      setPerguntaAtual(r.pergunta_estrutura);
+      setEstado("respondendo");
     } catch (e) {
       setErro(e instanceof Error ? e.message : "erro ao carregar rodada");
-    } finally {
-      setCarregando(false);
+      setEstado("erro");
     }
   }, []);
 
   const enviarPalpite = useCallback(
-    async (palpite: Estrutura) => {
-      if (!rodada) return;
-      setCarregando(true);
+    async (palpite: string) => {
+      if (!rodada || !perguntaAtual) return;
       setErro(null);
       try {
-        const v = await postPalpite(rodada.token, palpite);
-        setVeredito(v);
+        const v = await postPalpite(rodada.token, perguntaAtual.camada, palpite);
+        const novos = [...vereditosParciais, v];
+        setVereditosParciais(novos);
+        if (v.proxima_pergunta !== null) {
+          setPerguntaAtual(v.proxima_pergunta);
+        } else {
+          setPerguntaAtual(null);
+          setPontuacao(calcularPontuacao(novos));
+          setEstado("veredito");
+        }
       } catch (e) {
         setErro(e instanceof Error ? e.message : "erro ao enviar palpite");
-      } finally {
-        setCarregando(false);
+        setEstado("erro");
       }
     },
-    [rodada]
+    [rodada, perguntaAtual, vereditosParciais]
   );
+
+  const proximaRodada = useCallback(async () => {
+    await carregarRodada();
+  }, [carregarRodada]);
 
   useEffect(() => {
     if (inicializou.current) return;
@@ -65,11 +102,14 @@ export function useAdivinheRodada(
   }, [carregarRodada, seedInicial]);
 
   return {
+    estado,
     rodada,
-    veredito,
-    carregando,
+    perguntaAtual,
+    vereditosParciais,
+    pontuacao,
     erro,
     carregarRodada,
     enviarPalpite,
+    proximaRodada,
   };
 }
