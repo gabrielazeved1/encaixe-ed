@@ -193,3 +193,52 @@ export async function memoriaSimular(
     body: JSON.stringify({ operacoes }),
   });
 }
+
+export type Estrutura =
+  | "pilha"
+  | "fila"
+  | "heap"
+  | "hash"
+  | "bst"
+  | "linkedlist"
+  | "grafo";
+
+export type PassoJogo = {
+  indice: number;
+  descricao: string;
+  destaques: string[];
+  estado: unknown;
+};
+
+export type RodadaResult = {
+  token: string;
+  passos: PassoJogo[];
+};
+
+export type VereditoResult = {
+  acertou: boolean;
+  estrutura_correta: Estrutura;
+  explicacao: string;
+};
+
+export async function getRodada(seed?: number): Promise<RodadaResult> {
+  const qs = seed !== undefined ? `?seed=${seed}` : "";
+  const res = await fetch(`${API_BASE}/api/jogo_adivinhe/rodada${qs}`, {
+    method: "GET",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? `HTTP ${res.status}`);
+  }
+  return (await res.json()) as RodadaResult;
+}
+
+export async function postPalpite(
+  token: string,
+  palpite: Estrutura
+): Promise<VereditoResult> {
+  return apiFetch<VereditoResult>("/api/jogo_adivinhe/palpite", {
+    method: "POST",
+    body: JSON.stringify({ token, palpite }),
+  });
+}
