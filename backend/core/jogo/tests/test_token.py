@@ -22,7 +22,16 @@ def test_roundtrip_encode_decode_preserva_claims():
 def test_decode_rejeita_assinatura_adulterada():
     claims = {"e": "pilha", "op": "push_pop", "s": 1, "t": _agora()}
     s = token.encode(claims, SECRET)
-    adulterado = s[:-1] + ("A" if s[-1] != "A" else "B")
+    payload_b64, assinatura_b64 = s.split(".")
+    meio = len(assinatura_b64) // 2
+    char = assinatura_b64[meio]
+    adulterado = (
+        payload_b64
+        + "."
+        + assinatura_b64[:meio]
+        + ("A" if char != "A" else "B")
+        + assinatura_b64[meio + 1 :]
+    )
     with pytest.raises(token.TokenInvalido):
         token.decode(adulterado, SECRET, agora=_agora())
 

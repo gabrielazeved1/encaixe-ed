@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-ESTRUTURAS_CHOICES = ["pilha", "fila", "heap", "hash", "bst", "linkedlist", "grafo"]
+CAMADAS_CHOICES = ["estrutura", "operacao", "complexidade"]
 
 
 class RodadaQuerySerializer(serializers.Serializer):
@@ -15,14 +15,30 @@ class RodadaQuerySerializer(serializers.Serializer):
     )
 
 
-class PalpiteSerializer(serializers.Serializer):
+class PerguntaReveladaSerializer(serializers.Serializer):
+    camada = serializers.ChoiceField(choices=CAMADAS_CHOICES)
+    enunciado = serializers.CharField()
+    alternativas = serializers.ListField(
+        child=serializers.CharField(), min_length=4, max_length=4
+    )
+
+
+class PalpiteRequestSerializer(serializers.Serializer):
     token = serializers.CharField()
-    palpite = serializers.ChoiceField(
-        choices=ESTRUTURAS_CHOICES,
+    estagio = serializers.ChoiceField(
+        choices=CAMADAS_CHOICES,
         error_messages={
             "invalid_choice": (
-                "palpite deve ser uma das 7 estruturas: "
-                "pilha, fila, heap, hash, bst, linkedlist, grafo"
+                "estagio deve ser um de: estrutura, operacao, complexidade"
             )
         },
     )
+    palpite = serializers.CharField()
+
+
+class VereditoParcialSerializer(serializers.Serializer):
+    camada = serializers.ChoiceField(choices=CAMADAS_CHOICES)
+    acertou = serializers.BooleanField()
+    correto = serializers.CharField()
+    explicacao = serializers.CharField()
+    proxima_pergunta = PerguntaReveladaSerializer(allow_null=True)
