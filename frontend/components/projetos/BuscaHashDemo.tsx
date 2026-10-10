@@ -50,7 +50,11 @@ export function BuscaHashDemo() {
       {erro && <p className="text-red-400 text-sm mb-4">{erro}</p>}
 
       {resultado ? (
-        <BuscaHashVisual resultado={resultado} chave={chave} />
+        <BuscaHashVisual
+          passos={resultado.passos}
+          resumo={resultado}
+          chave={chave}
+        />
       ) : (
         <EmptyStateHash />
       )}

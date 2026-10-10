@@ -1,4 +1,4 @@
-import type { PassoBst, PassoPilha } from "@/types/passos";
+import type { PassoBst, PassoHash, PassoPilha } from "@/types/passos";
 
 export type Frame = {
   nome_funcao: string;
@@ -130,6 +130,7 @@ export type EntradaHash = { chave: string; valor: string };
 export type BuscaHashResult = {
   linear: { comparacoes: number; encontrado: boolean };
   hash: { comparacoes: number; encontrado: boolean; indice: number };
+  passos: PassoHash[];
 };
 
 export async function hashComparar(

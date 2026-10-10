@@ -39,3 +39,25 @@ def test_chave_vazia_retorna_400(client: Client) -> None:
         content_type="application/json",
     )
     assert res.status_code == 400
+
+
+def test_resposta_inclui_envelope_de_passos(client: Client) -> None:
+    res = client.post(
+        "/api/hash/comparar/",
+        data=json.dumps(
+            {
+                "dados": [
+                    {"chave": "a", "valor": 1},
+                    {"chave": "q", "valor": 2},
+                ],
+                "chave": "q",
+            }
+        ),
+        content_type="application/json",
+    )
+    assert res.status_code == 200
+    data = res.json()
+    passos = data["passos"]
+    assert isinstance(passos, list) and len(passos) >= 1
+    for p in passos:
+        assert set(p.keys()) >= {"indice", "descricao", "destaques", "estado"}

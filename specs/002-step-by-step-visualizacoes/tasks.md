@@ -108,18 +108,18 @@ description: "Lista de tasks ordenada para a feature 002-step-by-step-visualizac
 
 ### Backend Hash — estrutura pura + testes
 
-- [ ] T025 [US1] Adicionar `HashTable.para_dict()` em `backend/core/estruturas/hash_table.py` retornando `{"tamanho": self._tamanho, "buckets": [list(b) for b in self._buckets]}`
-- [ ] T026 [US1] Evoluir `HashTable.inserir(chave, valor, coletor=None)` para registrar: um passo com cálculo do hash e estado do bucket alvo antes de inserir (`"Inserindo \"{chave}\" → h(\"{chave}\") = {idx}. Bucket {idx} está {vazio|ocupado por X}."`, destaques `["bucket:<idx>"]`); se colisão, descrição explícita contendo a palavra `"Colisão"` conforme contracts/api-hash.md
-- [ ] T027 [US1] Evoluir `HashTable.buscar(chave, coletor=None)` para registrar um passo por comparação dentro do bucket; passo final `"Chave encontrada"` ou `"Chave não encontrada"` com `destaques=["bucket:<idx>"]`
-- [ ] T028 [US1] Em `comparar_busca` (mesmo arquivo), inserir primeiro um passo "Tabela vazia (16 buckets)." antes das inserções, criar `coletor`, propagar para todas as inserções e para a busca, e devolver `"passos": coletor` no dict final. Campos `linear` e `hash` legados permanecem
-- [ ] T029 [P] [US1] Criar `backend/core/estruturas/tests/test_hash_table.py` com entrada que força colisão determinística (ex.: strings cujo hash custom colide no bucket 5) e asserta: passo inicial descreve tabela vazia; existe pelo menos um passo cuja descrição contém `"Colisão"`; passo final da busca contém `"encontrada"` ou `"não encontrada"`; `destaques` do tipo `"bucket:<n>"` com `0 ≤ n < 16`
-- [ ] T030 [P] [US1] Adicionar em `backend/apps/busca_hash/test_busca_hash.py` teste de integração que valida presença de `passos` no response
+- [x] T025 [US1] Adicionar `HashTable.para_dict()` em `backend/core/estruturas/hash_table.py` retornando `{"tamanho": self._tamanho, "buckets": [list(b) for b in self._buckets]}`
+- [x] T026 [US1] Evoluir `HashTable.inserir(chave, valor, coletor=None)` para registrar: um passo com cálculo do hash e estado do bucket alvo antes de inserir (`"Inserindo \"{chave}\" → h(\"{chave}\") = {idx}. Bucket {idx} está {vazio|ocupado por X}."`, destaques `["bucket:<idx>"]`); se colisão, descrição explícita contendo a palavra `"Colisão"` conforme contracts/api-hash.md
+- [x] T027 [US1] Evoluir `HashTable.buscar(chave, coletor=None)` para registrar um passo por comparação dentro do bucket; passo final `"Chave encontrada"` ou `"Chave não encontrada"` com `destaques=["bucket:<idx>"]`
+- [x] T028 [US1] Em `comparar_busca` (mesmo arquivo), inserir primeiro um passo "Tabela vazia (16 buckets)." antes das inserções, criar `coletor`, propagar para todas as inserções e para a busca, e devolver `"passos": coletor` no dict final. Campos `linear` e `hash` legados permanecem
+- [x] T029 [P] [US1] Criar `backend/core/estruturas/tests/test_hash_table.py` com entrada que força colisão determinística (ex.: strings cujo hash custom colide no bucket 5) e asserta: passo inicial descreve tabela vazia; existe pelo menos um passo cuja descrição contém `"Colisão"`; passo final da busca contém `"encontrada"` ou `"não encontrada"`; `destaques` do tipo `"bucket:<n>"` com `0 ≤ n < 16`
+- [x] T030 [P] [US1] Adicionar em `backend/apps/busca_hash/test_busca_hash.py` teste de integração que valida presença de `passos` no response
 
 ### Frontend Hash
 
-- [ ] T031 [US1] Atualizar `frontend/hooks/useBuscaHash.ts` para expor `passos: PassoHash[]`
-- [ ] T032 [US1] [US3] Refatorar `frontend/components/projetos/BuscaHashVisual.tsx`: usar `useStepPlayer(passos)`; renderizar `passoAtual.estado.buckets` como grid; destaques `"bucket:<n>"` destacam a célula correspondente; integrar `<StepControls>` e `<StepNarrator>`
-- [ ] T033 [P] [US1] Criar `frontend/components/projetos/__tests__/BuscaHashVisual.test.tsx` com passos fake incluindo colisão verificando destaque + mensagem
+- [x] T031 [US1] Atualizar `frontend/hooks/useBuscaHash.ts` para expor `passos: PassoHash[]`
+- [x] T032 [US1] [US3] Refatorar `frontend/components/projetos/BuscaHashVisual.tsx`: usar `useStepPlayer(passos)`; renderizar `passoAtual.estado.buckets` como grid; destaques `"bucket:<n>"` destacam a célula correspondente; integrar `<StepControls>` e `<StepNarrator>`
+- [x] T033 [P] [US1] Criar `frontend/components/projetos/__tests__/BuscaHashVisual.test.tsx` com passos fake incluindo colisão verificando destaque + mensagem
 
 **Checkpoint**: três projetos no modo step-by-step manual. MVP de US1+US3 completo em todos os projetos integrados.
 
