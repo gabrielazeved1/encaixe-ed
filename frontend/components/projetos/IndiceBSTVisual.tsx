@@ -1,82 +1,156 @@
 "use client";
 
-import { NoBST, PassoBST } from "@/lib/api";
+import { StepControls } from "@/components/ui/StepControls";
+import { StepNarrator } from "@/components/ui/StepNarrator";
+import { useStepPlayer } from "@/hooks/useStepPlayer";
+import type { EstadoBst, NoBst, PassoBst } from "@/types/passos";
 
 type Props = {
-  arvore: NoBST | null;
-  passos: PassoBST[];
-  encontrado: boolean;
-  comparacoesBst: number;
-  comparacoesLinear: number;
+  passos: PassoBst[];
 };
 
-const CMP_LABEL: Record<PassoBST["comparacao"], string> = {
-  igual: "igual (encontrado)",
-  menor: "alvo < nó · desce à esquerda",
-  maior: "alvo > nó · desce à direita",
+type NoPosicionado = {
+  valor: number;
+  x: number;
+  y: number;
+  pai?: { x: number; y: number };
 };
 
-const CMP_COR: Record<PassoBST["comparacao"], string> = {
-  igual: "text-green-400 border-green-500/40",
-  menor: "text-blue-400 border-blue-500/40",
-  maior: "text-orange-400 border-orange-500/40",
-};
+function destaquesDeValores(destaques: string[]): Set<number> {
+  const alvos = new Set<number>();
+  for (const d of destaques) {
+    if (d.startsWith("no:")) {
+      const n = Number.parseInt(d.slice("no:".length), 10);
+      if (!Number.isNaN(n)) alvos.add(n);
+    }
+  }
+  return alvos;
+}
 
-export function IndiceBSTVisual({
-  passos,
-  encontrado,
-  comparacoesBst,
-  comparacoesLinear,
-}: Props) {
+function posicionarNos(
+  no: NoBst,
+  x: number,
+  y: number,
+  passoX: number,
+  pai: { x: number; y: number } | undefined,
+  acc: NoPosicionado[]
+): void {
+  if (no === null) return;
+  acc.push({ valor: no.valor, x, y, pai });
+  const prox = passoX / 2;
+  posicionarNos(no.esq, x - passoX, y + 42, prox, { x, y }, acc);
+  posicionarNos(no.dir, x + passoX, y + 42, prox, { x, y }, acc);
+}
+
+function profundidade(no: NoBst): number {
+  if (no === null) return 0;
+  return 1 + Math.max(profundidade(no.esq), profundidade(no.dir));
+}
+
+function TreeView({
+  arvore,
+  destacados,
+}: {
+  arvore: EstadoBst;
+  destacados: Set<number>;
+}) {
+  if (arvore === null) {
+    return (
+      <div className="flex h-full min-h-48 items-center justify-center font-mono text-sm text-slate-600">
+        árvore vazia
+      </div>
+    );
+  }
+  const d = profundidade(arvore);
+  const largura = Math.max(200, 2 ** d * 32);
+  const altura = d * 44 + 20;
+  const passoInicial = largura / 4;
+  const nos: NoPosicionado[] = [];
+  posicionarNos(arvore, largura / 2, 20, passoInicial, undefined, nos);
+
+  return (
+    <svg
+      viewBox={`0 0 ${largura} ${altura}`}
+      className="w-full"
+      role="img"
+      aria-label="árvore binária de busca"
+    >
+      {nos.map(
+        (n) =>
+          n.pai && (
+            <line
+              key={`e-${n.valor}`}
+              x1={n.pai.x}
+              y1={n.pai.y}
+              x2={n.x}
+              y2={n.y}
+              stroke="rgb(45 212 191)"
+              strokeWidth="1.5"
+              opacity="0.35"
+            />
+          )
+      )}
+      {nos.map((n) => {
+        const alvo = destacados.has(n.valor);
+        return (
+          <g key={n.valor} data-destaque={alvo ? `no:${n.valor}` : undefined}>
+            <circle
+              cx={n.x}
+              cy={n.y}
+              r={14}
+              fill={alvo ? "rgb(30 64 175)" : "rgb(19 78 74)"}
+              stroke={alvo ? "rgb(96 165 250)" : "rgb(45 212 191)"}
+              strokeWidth={alvo ? "2.5" : "1.5"}
+              className="transition-colors duration-200"
+            />
+            <text
+              x={n.x}
+              y={n.y + 4}
+              textAnchor="middle"
+              fill={alvo ? "rgb(219 234 254)" : "rgb(204 251 241)"}
+              fontSize="11"
+              fontFamily="monospace"
+            >
+              {n.valor}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+export function IndiceBSTVisual({ passos }: Props) {
+  const player = useStepPlayer<EstadoBst>(passos);
+  const passo = player.passoAtual;
+  const arvore: EstadoBst = passo?.estado ?? null;
+  const destacados = destaquesDeValores(passo?.destaques ?? []);
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-lg bg-[#0d1117] border border-teal-500/40 p-4 text-center">
-          <div className="text-xs font-semibold tracking-wider uppercase text-teal-400">
-            BST
-          </div>
-          <div className="mt-1 text-3xl font-mono font-bold text-teal-300">
-            {comparacoesBst}
-          </div>
-          <div className="text-xs text-slate-500 mt-0.5">comparações</div>
+      <div className="grid gap-4 md:grid-cols-[1fr_minmax(14rem,22rem)]">
+        <div className="min-h-56 rounded-lg border border-slate-700 bg-[#0d1117] p-4">
+          <TreeView arvore={arvore} destacados={destacados} />
         </div>
-        <div className="rounded-lg bg-[#0d1117] border border-slate-600 p-4 text-center">
-          <div className="text-xs font-semibold tracking-wider uppercase text-slate-400">
-            Linear
-          </div>
-          <div className="mt-1 text-3xl font-mono font-bold text-slate-300">
-            {comparacoesLinear}
-          </div>
-          <div className="text-xs text-slate-500 mt-0.5">comparações</div>
-        </div>
+
+        <StepNarrator
+          descricao={passo?.descricao ?? null}
+          destaques={passo?.destaques ?? []}
+          indice={passo ? player.indice : null}
+          totalPassos={player.totalPassos}
+        />
       </div>
 
-      <div className="rounded-lg bg-[#0d1117] border border-slate-700 p-4 space-y-3">
-        <p className="text-xs font-semibold tracking-wider uppercase text-slate-500">
-          Caminho da busca
-        </p>
-        {passos.length === 0 ? (
-          <p className="text-sm text-slate-500 font-mono">sem passos</p>
-        ) : (
-          <ol className="space-y-2">
-            {passos.map((p, i) => (
-              <li
-                key={i}
-                className={`flex items-center gap-3 rounded border ${CMP_COR[p.comparacao]} bg-slate-900/40 px-3 py-2 font-mono text-sm`}
-              >
-                <span className="text-slate-600 text-xs w-5">{i + 1}</span>
-                <span className="text-slate-200">nó {p.no}</span>
-                <span className="text-slate-500">→</span>
-                <span>{CMP_LABEL[p.comparacao]}</span>
-              </li>
-            ))}
-          </ol>
-        )}
-        <p
-          className={`text-sm font-mono ${encontrado ? "text-green-400" : "text-red-400"}`}
-        >
-          {encontrado ? "✓ valor encontrado" : "✗ valor não encontrado"}
-        </p>
+      <div className="flex justify-center">
+        <StepControls
+          indice={player.indice}
+          totalPassos={player.totalPassos}
+          podeAvancar={player.podeAvancar}
+          podeVoltar={player.podeVoltar}
+          onAvancar={player.avancar}
+          onVoltar={player.voltar}
+          onResetar={player.resetar}
+        />
       </div>
     </div>
   );

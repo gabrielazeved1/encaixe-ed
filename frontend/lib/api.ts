@@ -1,4 +1,4 @@
-import type { PassoPilha } from "@/types/passos";
+import type { PassoBst, PassoPilha } from "@/types/passos";
 
 export type Frame = {
   nome_funcao: string;
@@ -146,7 +146,8 @@ export type NoBST = { valor: number; esq: NoBST | null; dir: NoBST | null };
 export type PassoBST = { no: number; comparacao: "igual" | "menor" | "maior" };
 export type BSTResult = {
   arvore: NoBST | null;
-  passos: PassoBST[];
+  passos: PassoBst[];
+  passos_busca: PassoBST[];
   encontrado: boolean;
   comparacoes_bst: number;
   comparacoes_linear: number;

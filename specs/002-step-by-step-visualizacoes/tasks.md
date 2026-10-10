@@ -84,17 +84,17 @@ description: "Lista de tasks ordenada para a feature 002-step-by-step-visualizac
 
 ### Backend BST — estrutura pura + testes
 
-- [ ] T017 [US1] Evoluir `backend/core/estruturas/bst.py`: `BST.inserir(valor, coletor=None)` registra um passo antes de cada comparação (`"Comparando {valor} com nó {no.valor} → desce para a {esquerda|direita}."`, destaques `["no:<valor_no>"]`) e um passo final quando posição é encontrada (`"Posição vazia à {esquerda|direita} de {pai}. Inserindo {valor} ali."`, destaques `["no:<valor>"]`). Caso inserção na árvore vazia: um único passo `"Árvore vazia. Inserindo {valor} como raiz."`. `estado` em cada passo = `self.para_dict()` após eventual mutação
-- [ ] T018 [US1] Evoluir `BST.buscar(valor, coletor=None)` no mesmo arquivo para registrar um passo por comparação visitada, usando as mesmas descrições do fluxo de inserção adaptadas para busca; passo final descreve "Chave encontrada" ou "Chave não encontrada". Manter o retorno `{"encontrado", "passos": passos_busca}` legado — renomeá-lo para `"passos_busca"` para liberar a chave `"passos"` para o novo envelope (research.md §6)
-- [ ] T019 [US1] Em `simular_bst` (mesmo arquivo), criar `coletor` único, passar para cada `inserir` e para o `buscar`, e devolver `"passos": coletor` no dict final. Renomear o antigo `"passos"` para `"passos_busca"` no retorno
-- [ ] T020 [P] [US1] Criar `backend/core/estruturas/tests/test_bst.py` com casos: `simular_bst([50], 50)` → `passos` com 2 itens (inserção raiz + busca igual); `simular_bst([50,30,70,40], 40)` → `passos` com inserções em ordem + 3 passos de busca; descrições incluem substrings esperadas (`"raiz"`, `"esquerda"`, `"Chave encontrada"`); `destaques` referenciam valores existentes
-- [ ] T021 [P] [US1] Adicionar em `backend/apps/indice_bst/test_indice_bst.py` teste de integração: POST com `{"valores":[50,30,70],"alvo":30}` retorna `passos` não-vazio e `passos_busca` com formato antigo preservado
+- [x] T017 [US1] Evoluir `backend/core/estruturas/bst.py`: `BST.inserir(valor, coletor=None)` registra um passo antes de cada comparação (`"Comparando {valor} com nó {no.valor} → desce para a {esquerda|direita}."`, destaques `["no:<valor_no>"]`) e um passo final quando posição é encontrada (`"Posição vazia à {esquerda|direita} de {pai}. Inserindo {valor} ali."`, destaques `["no:<valor>"]`). Caso inserção na árvore vazia: um único passo `"Árvore vazia. Inserindo {valor} como raiz."`. `estado` em cada passo = `self.para_dict()` após eventual mutação
+- [x] T018 [US1] Evoluir `BST.buscar(valor, coletor=None)` no mesmo arquivo para registrar um passo por comparação visitada, usando as mesmas descrições do fluxo de inserção adaptadas para busca; passo final descreve "Chave encontrada" ou "Chave não encontrada". Manter o retorno `{"encontrado", "passos": passos_busca}` legado — renomeá-lo para `"passos_busca"` para liberar a chave `"passos"` para o novo envelope (research.md §6)
+- [x] T019 [US1] Em `simular_bst` (mesmo arquivo), criar `coletor` único, passar para cada `inserir` e para o `buscar`, e devolver `"passos": coletor` no dict final. Renomear o antigo `"passos"` para `"passos_busca"` no retorno
+- [x] T020 [P] [US1] Criar `backend/core/estruturas/tests/test_bst.py` com casos: `simular_bst([50], 50)` → `passos` com 2 itens (inserção raiz + busca igual); `simular_bst([50,30,70,40], 40)` → `passos` com inserções em ordem + 3 passos de busca; descrições incluem substrings esperadas (`"raiz"`, `"esquerda"`, `"Chave encontrada"`); `destaques` referenciam valores existentes
+- [x] T021 [P] [US1] Adicionar em `backend/apps/indice_bst/test_indice_bst.py` teste de integração: POST com `{"valores":[50,30,70],"alvo":30}` retorna `passos` não-vazio e `passos_busca` com formato antigo preservado
 
 ### Frontend BST
 
-- [ ] T022 [US1] Atualizar `frontend/hooks/useIndiceBST.ts` para expor `passos: PassoBst[]`
-- [ ] T023 [US1] [US3] Refatorar `frontend/components/projetos/IndiceBSTVisual.tsx`: usar `useStepPlayer(passos)`; renderizar `passoAtual.estado` como árvore (reusar o renderer atual); destaques `"no:<valor>"` adicionam ring/glow nos nós correspondentes; integrar `<StepControls>` e `<StepNarrator>`
-- [ ] T024 [P] [US1] Criar `frontend/components/projetos/__tests__/IndiceBSTVisual.test.tsx` com passos fake simulando inserção + busca verificando destaque no nó certo a cada passo
+- [x] T022 [US1] Atualizar `frontend/hooks/useIndiceBST.ts` para expor `passos: PassoBst[]`
+- [x] T023 [US1] [US3] Refatorar `frontend/components/projetos/IndiceBSTVisual.tsx`: usar `useStepPlayer(passos)`; renderizar `passoAtual.estado` como árvore (reusar o renderer atual); destaques `"no:<valor>"` adicionam ring/glow nos nós correspondentes; integrar `<StepControls>` e `<StepNarrator>`
+- [x] T024 [P] [US1] Criar `frontend/components/projetos/__tests__/IndiceBSTVisual.test.tsx` com passos fake simulando inserção + busca verificando destaque no nó certo a cada passo
 
 **Checkpoint**: `/projetos/indice-bst` em modo step-by-step. US1 + US3 entregues.
 

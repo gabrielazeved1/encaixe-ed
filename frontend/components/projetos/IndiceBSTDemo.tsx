@@ -69,13 +69,7 @@ export function IndiceBSTDemo() {
       {erro && <p className="text-red-400 text-sm mb-4">{erro}</p>}
 
       {resultado ? (
-        <IndiceBSTVisual
-          arvore={resultado.arvore}
-          passos={resultado.passos}
-          encontrado={resultado.encontrado}
-          comparacoesBst={resultado.comparacoes_bst}
-          comparacoesLinear={resultado.comparacoes_linear}
-        />
+        <IndiceBSTVisual passos={resultado.passos} />
       ) : (
         <EmptyStateBST />
       )}
