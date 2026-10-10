@@ -95,3 +95,46 @@ def test_valor_invalido_levanta_value_error() -> None:
 def test_funcao_invalida_levanta_value_error() -> None:
     with pytest.raises(ValueError):
         simular_pilha("mergesort", 5)
+
+
+def test_passos_fatorial_1_tem_dois_passos_denso() -> None:
+    result = simular_pilha("fatorial", 1)
+    passos = result["passos"]
+    assert isinstance(passos, list)
+    assert len(passos) == 2
+    assert [p["indice"] for p in passos] == [0, 1]
+    assert all(p["descricao"] for p in passos)
+
+
+def test_passos_fatorial_3_tem_6_passos() -> None:
+    result = simular_pilha("fatorial", 3)
+    passos = result["passos"]
+    assert isinstance(passos, list)
+    assert len(passos) == 6
+    assert [p["indice"] for p in passos] == [0, 1, 2, 3, 4, 5]
+
+
+def test_passos_descricao_primeira_chamada_contem_funcao_e_valor() -> None:
+    result = simular_pilha("fatorial", 3)
+    passos = result["passos"]
+    primeiro = passos[0]
+    assert "fatorial(3)" in primeiro["descricao"]
+    assert "recursivamente" not in primeiro["descricao"]
+    assert primeiro["destaques"] == ["frame:3"]
+
+
+def test_passos_chamadas_recursivas_sao_marcadas() -> None:
+    result = simular_pilha("fatorial", 3)
+    passos = result["passos"]
+    descricoes_push = [p["descricao"] for p in passos if "Empurrando" in p["descricao"]]
+    assert len(descricoes_push) == 3
+    assert "recursivamente" in descricoes_push[1]
+    assert "recursivamente" in descricoes_push[2]
+
+
+def test_passos_overflow_tem_descricao_explicativa() -> None:
+    result = simular_pilha("fibonacci", 100, max_depth=5)
+    passos = result["passos"]
+    ultimo = passos[-1]
+    assert "stack overflow" in ultimo["descricao"]
+    assert "MAX_DEPTH" in ultimo["descricao"]

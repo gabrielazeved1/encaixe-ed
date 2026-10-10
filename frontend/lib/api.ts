@@ -1,3 +1,5 @@
+import type { PassoPilha } from "@/types/passos";
+
 export type Frame = {
   nome_funcao: string;
   argumento: number;
@@ -16,6 +18,7 @@ export type SimulacaoResult = {
   valor: number;
   status: "completo" | "overflow";
   frames: Evento[];
+  passos: PassoPilha[];
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";

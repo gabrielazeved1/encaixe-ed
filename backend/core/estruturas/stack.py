@@ -1,5 +1,7 @@
 from typing import TypeVar, Generic
 
+from core.estruturas.passos import PassoColetor, fazer_passo
+
 T = TypeVar("T")
 
 MAX_DEPTH = 50
@@ -53,22 +55,77 @@ def _make_evento(
     return {"tipo": tipo, "frame": frame, "pilha_estado": list(pilha_estado)}
 
 
+def _registrar_push(
+    passos: PassoColetor,
+    nome_funcao: str,
+    n: int,
+    pilha: Stack[FrameDict],
+    chamada_recursiva: bool,
+) -> None:
+    acao = (
+        f"Chamando {nome_funcao}({n}) recursivamente"
+        if chamada_recursiva
+        else f"Chamando {nome_funcao}({n})"
+    )
+    fazer_passo(
+        passos,
+        f"{acao}. Empurrando frame na pilha.",
+        [f"frame:{n}"],
+        pilha.snapshot(),
+    )
+
+
+def _registrar_pop(
+    passos: PassoColetor,
+    nome_funcao: str,
+    n: int,
+    resultado: int,
+    pilha: Stack[FrameDict],
+) -> None:
+    fazer_passo(
+        passos,
+        f"{nome_funcao}({n}) retornou {resultado}. Desempilhando frame.",
+        [f"frame:{n}"],
+        pilha.snapshot(),
+    )
+
+
+def _registrar_overflow(
+    passos: PassoColetor, nome_funcao: str, n: int, pilha: Stack[FrameDict]
+) -> None:
+    fazer_passo(
+        passos,
+        (
+            f"A pilha estourou (MAX_DEPTH atingido) tentando chamar "
+            f"{nome_funcao}({n}). Isso é um stack overflow."
+        ),
+        [f"frame:{n}"],
+        pilha.snapshot(),
+    )
+
+
 def _simular_fatorial(
-    n: int, pilha: Stack[FrameDict], eventos: list[EventoDict]
+    n: int,
+    pilha: Stack[FrameDict],
+    eventos: list[EventoDict],
+    passos: PassoColetor,
+    recursiva: bool,
 ) -> int | None:
     if len(pilha) >= MAX_DEPTH:
         frame = _make_frame("fatorial", n, None, len(pilha) + 1)
         eventos.append(_make_evento("overflow", frame, pilha.snapshot()))
+        _registrar_overflow(passos, "fatorial", n, pilha)
         return None
 
     frame = _make_frame("fatorial", n, None, len(pilha) + 1)
     pilha.push(frame)
     eventos.append(_make_evento("push", frame, pilha.snapshot()))
+    _registrar_push(passos, "fatorial", n, pilha, recursiva)
 
     if n <= 1:
         resultado = 1
     else:
-        sub = _simular_fatorial(n - 1, pilha, eventos)
+        sub = _simular_fatorial(n - 1, pilha, eventos, passos, recursiva=True)
         if sub is None:
             return None
         resultado = n * sub
@@ -76,28 +133,35 @@ def _simular_fatorial(
     frame_pop = _make_frame("fatorial", n, resultado, len(pilha))
     pilha.pop()
     eventos.append(_make_evento("pop", frame_pop, pilha.snapshot()))
+    _registrar_pop(passos, "fatorial", n, resultado, pilha)
     return resultado
 
 
 def _simular_fibonacci(
-    n: int, pilha: Stack[FrameDict], eventos: list[EventoDict]
+    n: int,
+    pilha: Stack[FrameDict],
+    eventos: list[EventoDict],
+    passos: PassoColetor,
+    recursiva: bool,
 ) -> int | None:
     if len(pilha) >= MAX_DEPTH:
         frame = _make_frame("fibonacci", n, None, len(pilha) + 1)
         eventos.append(_make_evento("overflow", frame, pilha.snapshot()))
+        _registrar_overflow(passos, "fibonacci", n, pilha)
         return None
 
     frame = _make_frame("fibonacci", n, None, len(pilha) + 1)
     pilha.push(frame)
     eventos.append(_make_evento("push", frame, pilha.snapshot()))
+    _registrar_push(passos, "fibonacci", n, pilha, recursiva)
 
     if n <= 1:
         resultado = n
     else:
-        esq = _simular_fibonacci(n - 1, pilha, eventos)
+        esq = _simular_fibonacci(n - 1, pilha, eventos, passos, recursiva=True)
         if esq is None:
             return None
-        dir_ = _simular_fibonacci(n - 2, pilha, eventos)
+        dir_ = _simular_fibonacci(n - 2, pilha, eventos, passos, recursiva=True)
         if dir_ is None:
             return None
         resultado = esq + dir_
@@ -105,6 +169,7 @@ def _simular_fibonacci(
     frame_pop = _make_frame("fibonacci", n, resultado, len(pilha))
     pilha.pop()
     eventos.append(_make_evento("pop", frame_pop, pilha.snapshot()))
+    _registrar_pop(passos, "fibonacci", n, resultado, pilha)
     return resultado
 
 
@@ -118,6 +183,7 @@ def simular_pilha(
 
     pilha: Stack[FrameDict] = Stack()
     eventos: list[EventoDict] = []
+    passos: PassoColetor = []
 
     global MAX_DEPTH
     original = MAX_DEPTH
@@ -125,9 +191,9 @@ def simular_pilha(
 
     try:
         if funcao == "fatorial":
-            _simular_fatorial(valor, pilha, eventos)
+            _simular_fatorial(valor, pilha, eventos, passos, recursiva=False)
         else:
-            _simular_fibonacci(valor, pilha, eventos)
+            _simular_fibonacci(valor, pilha, eventos, passos, recursiva=False)
     finally:
         MAX_DEPTH = original
 
@@ -137,4 +203,5 @@ def simular_pilha(
         "valor": valor,
         "status": "overflow" if overflow else "completo",
         "frames": eventos,
+        "passos": passos,
     }

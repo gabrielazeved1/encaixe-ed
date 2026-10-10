@@ -48,3 +48,21 @@ def test_fibonacci_grande_retorna_overflow_com_status_correto(client: Client) ->
     data = res.json()
     assert data["status"] == "overflow"
     assert data["frames"][-1]["tipo"] == "overflow"
+
+
+def test_resposta_inclui_envelope_de_passos(client: Client) -> None:
+    res = client.post(
+        "/api/pilha/simular/",
+        data=json.dumps({"funcao": "fatorial", "valor": 3}),
+        content_type="application/json",
+    )
+    assert res.status_code == 200
+    data = res.json()
+    passos = data["passos"]
+    assert isinstance(passos, list)
+    assert len(passos) > 0
+    for i, p in enumerate(passos):
+        assert p["indice"] == i
+        assert isinstance(p["descricao"], str) and p["descricao"]
+        assert isinstance(p["destaques"], list)
+        assert "estado" in p
