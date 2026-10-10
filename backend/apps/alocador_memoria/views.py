@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import AlocadorSerializer
-from core.estruturas.linked_list import simular_alocador
+from core.estruturas.alocador import simular_alocador
 
 
 class AlocadorMemoriaView(APIView):
