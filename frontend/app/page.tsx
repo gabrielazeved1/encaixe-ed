@@ -125,6 +125,35 @@ export default function Home() {
       </section>
 
       <section className="border-t border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <Link
+            href="/adivinhe"
+            className="group block rounded-xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-8 transition hover:border-blue-400/60 hover:from-blue-500/20 hover:to-purple-500/20"
+          >
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 justify-between">
+              <div className="space-y-2">
+                <p className="text-xs font-mono uppercase tracking-wider text-blue-400">
+                  Modo jogo
+                </p>
+                <h2 className="text-2xl font-bold text-white">
+                  Adivinhe a Estrutura
+                </h2>
+                <p className="text-slate-400 text-sm leading-relaxed max-w-lg">
+                  Teste sua intuição: veja uma sequência de passos sem rótulo e
+                  identifique qual das 7 estruturas está sendo demonstrada pela
+                  mecânica.
+                </p>
+              </div>
+              <span className="shrink-0 inline-flex items-center gap-2 rounded-lg border border-blue-500/50 bg-blue-500/20 px-5 py-2.5 text-sm font-medium text-blue-100 transition group-hover:border-blue-400 group-hover:bg-blue-500/30">
+                Jogar agora
+                <span aria-hidden="true">→</span>
+              </span>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      <section className="border-t border-slate-800">
         <div className="max-w-6xl mx-auto px-4 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center sm:text-left">
             <p className="text-white font-semibold">
