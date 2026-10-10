@@ -241,6 +241,8 @@ A visualização aqui funciona em modo passo-a-passo: a tabela nasce vazia e cad
 
 O resultado mostra lado a lado: quantas comparações a BST precisou vs. uma varredura linear. Para a árvore do exemplo (7 nós balanceados), a BST chega em qualquer valor em no máximo 3 comparações. Linear pode precisar de 7.
 
+**Pior caso:** esta BST não rebalanceia. Se os valores forem inseridos em ordem crescente (1, 2, 3, 4...) ou decrescente, a árvore degenera em uma estrutura equivalente a uma lista encadeada — cada nó só tem filho de um lado — e a busca passa a custar O(n), igual à varredura linear. Em cenários reais usamos árvores balanceadas (AVL, Red-Black, B-Tree) para evitar essa degeneração; aqui focamos na BST pura para ver a mecânica sem o ruído do balanceamento.
+
 No dia a dia: índices B-Tree do PostgreSQL e MySQL são a evolução direta da BST — árvores com múltiplos filhos por nó para reduzir a altura e os acessos a disco. Quando você faz SELECT sem índice, o banco faz varredura linear. Com índice B-Tree, faz busca logarítmica. Em Banco de Dados você vai entender por que criar índices nos campos de busca frequente é uma das otimizações mais importantes.
 
 A visualização aqui funciona em modo passo-a-passo: cada inserção e cada comparação da busca viram um passo com descrição em pt-BR. Dá para avançar manualmente ou deixar o autoplay rodar para ver a árvore nascendo nó a nó.`,
