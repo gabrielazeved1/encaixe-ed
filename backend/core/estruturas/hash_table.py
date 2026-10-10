@@ -114,14 +114,14 @@ def comparar_busca(dados: list[EntradaDict], chave: str) -> ResultadoDict:
     for entrada in dados:
         ht.inserir(str(entrada["chave"]), entrada["valor"], coletor)
 
-    _, hash_comp = ht.buscar(chave, coletor)
+    valor, hash_comp = ht.buscar(chave, coletor)
     idx = ht.indice(chave)
 
     return {
         "linear": {"comparacoes": linear_comp, "encontrado": linear_encontrado},
         "hash": {
             "comparacoes": hash_comp,
-            "encontrado": linear_encontrado,
+            "encontrado": valor is not None,
             "indice": idx,
         },
         "passos": coletor,

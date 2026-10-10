@@ -84,6 +84,16 @@ def test_passos_destaques_apontam_para_bucket_valido() -> None:
             assert 0 <= n < 16
 
 
+def test_hash_encontrado_vem_do_resultado_da_busca_hash() -> None:
+    dados = [{"chave": "a", "valor": 1}]
+    r_presente = comparar_busca(dados, "a")
+    assert r_presente["hash"]["encontrado"] is True
+
+    r_ausente = comparar_busca(dados, "b")
+    assert r_ausente["linear"]["encontrado"] is False
+    assert r_ausente["hash"]["encontrado"] is False
+
+
 def test_passos_indices_densos_e_envelope_bem_formado() -> None:
     dados = [{"chave": "nome", "valor": "Gabriel"}]
     r = comparar_busca(dados, "nome")
