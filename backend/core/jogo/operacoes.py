@@ -11,11 +11,14 @@ from core.estruturas.queue import Queue
 from core.estruturas.stack import Stack
 
 
-@dataclass
+@dataclass(frozen=True)
 class OperacaoJogavel:
     estrutura: str
     nome: str
     executar: Callable[[Random], list[Passo]]
+    nome_tecnico: str
+    invariante: str
+    complexidade_pior: str
 
 
 def _pilha_push_pop(rng: Random) -> list[Passo]:
@@ -248,17 +251,74 @@ def _grafo_dijkstra_4nos(rng: Random) -> list[Passo]:
 
 
 OPERACOES: dict[str, list[OperacaoJogavel]] = {
-    "pilha": [OperacaoJogavel("pilha", "push_pop", _pilha_push_pop)],
-    "fila": [OperacaoJogavel("fila", "enqueue_dequeue", _fila_enqueue_dequeue)],
-    "heap": [OperacaoJogavel("heap", "push_sift", _heap_push_sift)],
-    "hash": [
-        OperacaoJogavel("hash", "inserir_colidir_buscar", _hash_inserir_colidir_buscar)
-    ],
-    "bst": [OperacaoJogavel("bst", "inserir_buscar", _bst_inserir_buscar)],
-    "linkedlist": [
+    "pilha": [
         OperacaoJogavel(
-            "linkedlist", "push_insert_remove", _linkedlist_push_insert_remove
+            estrutura="pilha",
+            nome="push_pop",
+            executar=_pilha_push_pop,
+            nome_tecnico="push + pop",
+            invariante="LIFO: o último elemento inserido é o primeiro a ser removido.",
+            complexidade_pior="O(1)",
         )
     ],
-    "grafo": [OperacaoJogavel("grafo", "dijkstra_4nos", _grafo_dijkstra_4nos)],
+    "fila": [
+        OperacaoJogavel(
+            estrutura="fila",
+            nome="enqueue_dequeue",
+            executar=_fila_enqueue_dequeue,
+            nome_tecnico="enqueue + dequeue",
+            invariante="FIFO: o primeiro elemento inserido é o primeiro a ser removido.",
+            complexidade_pior="O(1)",
+        )
+    ],
+    "heap": [
+        OperacaoJogavel(
+            estrutura="heap",
+            nome="push_sift",
+            executar=_heap_push_sift,
+            nome_tecnico="SIFT-UP (percolate-up)",
+            invariante="Em um min-heap, todo pai é menor ou igual a seus filhos.",
+            complexidade_pior="O(log n)",
+        )
+    ],
+    "hash": [
+        OperacaoJogavel(
+            estrutura="hash",
+            nome="inserir_colidir_buscar",
+            executar=_hash_inserir_colidir_buscar,
+            nome_tecnico="encadeamento separado + busca",
+            invariante="Chaves com mesma função de dispersão compartilham o mesmo bucket por encadeamento.",
+            complexidade_pior="O(n)",
+        )
+    ],
+    "bst": [
+        OperacaoJogavel(
+            estrutura="bst",
+            nome="inserir_buscar",
+            executar=_bst_inserir_buscar,
+            nome_tecnico="busca binária em árvore (pior caso degenerado)",
+            invariante="Para todo nó, a subárvore esquerda contém chaves menores e a direita, chaves maiores.",
+            complexidade_pior="O(n)",
+        )
+    ],
+    "linkedlist": [
+        OperacaoJogavel(
+            estrutura="linkedlist",
+            nome="push_insert_remove",
+            executar=_linkedlist_push_insert_remove,
+            nome_tecnico="insert_at / remove_at (posição arbitrária)",
+            invariante="Cada nó referencia o próximo; acesso por índice requer travessia sequencial.",
+            complexidade_pior="O(n)",
+        )
+    ],
+    "grafo": [
+        OperacaoJogavel(
+            estrutura="grafo",
+            nome="dijkstra_4nos",
+            executar=_grafo_dijkstra_4nos,
+            nome_tecnico="Dijkstra (via fila de prioridade)",
+            invariante="A cada iteração, extrai-se o vértice de menor custo acumulado e relaxam-se suas arestas.",
+            complexidade_pior="O((V+E) log V)",
+        )
+    ],
 }

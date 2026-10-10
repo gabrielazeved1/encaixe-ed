@@ -1,6 +1,11 @@
 import pytest
 
-from core.jogo.neutralidade import PROIBIDAS, VazamentoDeNome, varredura_neutra
+from core.jogo.neutralidade import (
+    PROIBIDAS,
+    VazamentoDeNome,
+    varredura_neutra,
+    varredura_neutra_texto,
+)
 from core.jogo.operacoes import OPERACOES
 from random import Random
 
@@ -81,3 +86,17 @@ def test_todas_operacoes_sao_neutras_para_100_seeds(seed):
         for op in lista:
             passos = op.executar(Random(seed))
             varredura_neutra(passos)
+
+
+def test_varredura_neutra_texto_detecta_vazamento():
+    with pytest.raises(VazamentoDeNome):
+        varredura_neutra_texto("empurrei na pilha")
+
+
+def test_varredura_neutra_texto_aceita_string_neutra():
+    varredura_neutra_texto("operação em arranjo com ordem parcial")
+
+
+def test_varredura_neutra_texto_eh_case_insensitive():
+    with pytest.raises(VazamentoDeNome):
+        varredura_neutra_texto("DIJKSTRA é famoso")

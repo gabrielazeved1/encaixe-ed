@@ -5,6 +5,8 @@ import json
 import time
 from typing import TypedDict
 
+from core.jogo.operacoes import OPERACOES
+
 
 TTL_SEGUNDOS = 3600
 
@@ -21,6 +23,7 @@ ESTRUTURAS_VALIDAS = {
 
 class ClaimsRodada(TypedDict):
     e: str
+    op: str
     s: int
     t: int
 
@@ -87,12 +90,17 @@ def decode(
 
     if not isinstance(claims, dict):
         raise TokenInvalido("claims não é objeto")
-    if set(claims.keys()) != {"e", "s", "t"}:
+    if set(claims.keys()) != {"e", "op", "s", "t"}:
         raise TokenInvalido("claims com chaves inesperadas")
     if claims["e"] not in ESTRUTURAS_VALIDAS:
         raise TokenInvalido("estrutura desconhecida")
     if not isinstance(claims["s"], int) or not isinstance(claims["t"], int):
         raise TokenInvalido("tipos inválidos")
+    if not isinstance(claims["op"], str):
+        raise TokenInvalido("op com tipo inválido")
+    ops_validas = {op.nome for op in OPERACOES[claims["e"]]}
+    if claims["op"] not in ops_validas:
+        raise TokenInvalido("op desconhecida para a estrutura")
 
     if agora - claims["t"] >= TTL_SEGUNDOS:
         raise TokenExpirado("rodada expirada")

@@ -41,3 +41,10 @@ def varredura_neutra(passos: list[Passo]) -> None:
     for palavra in PROIBIDAS:
         if palavra in texto:
             raise VazamentoDeNome(f"substring proibida encontrada: {palavra!r}")
+
+
+def varredura_neutra_texto(texto: str) -> None:
+    alvo = texto.lower()
+    for palavra in PROIBIDAS:
+        if palavra in alvo:
+            raise VazamentoDeNome(f"substring proibida encontrada: {palavra!r}")

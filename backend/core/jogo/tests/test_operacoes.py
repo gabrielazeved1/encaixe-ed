@@ -104,3 +104,31 @@ def test_operacao_deterministica_com_mesma_seed():
             p1 = op.executar(Random(123))
             p2 = op.executar(Random(123))
             assert p1 == p2, f"{estrutura}/{op.nome} não é determinística"
+
+
+COMPLEXIDADES_VALIDAS = {
+    "O(1)",
+    "O(log n)",
+    "O(n)",
+    "O(n log n)",
+    "O(n²)",
+    "O((V+E) log V)",
+}
+
+
+def test_cada_operacao_tem_nome_tecnico_nao_vazio():
+    for lista in OPERACOES.values():
+        for op in lista:
+            assert isinstance(op.nome_tecnico, str) and op.nome_tecnico.strip()
+
+
+def test_cada_operacao_tem_invariante_nao_vazio():
+    for lista in OPERACOES.values():
+        for op in lista:
+            assert isinstance(op.invariante, str) and op.invariante.strip()
+
+
+def test_cada_operacao_tem_complexidade_pior_valida():
+    for lista in OPERACOES.values():
+        for op in lista:
+            assert op.complexidade_pior in COMPLEXIDADES_VALIDAS
