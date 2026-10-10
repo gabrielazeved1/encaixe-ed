@@ -68,6 +68,19 @@ def test_montar_pergunta_preserva_resposta_correta_apos_shuffle():
             assert isinstance(correta, str) and correta.strip()
 
 
+def test_banco_tem_pelo_menos_42_perguntas_no_total():
+    total = sum(len(v) for v in BANCO.values())
+    assert total >= 42, f"total {total} < 42"
+
+
+def test_enunciados_sao_distintos_dentro_de_cada_combinacao():
+    for chave, lista in BANCO.items():
+        enunciados = {p.enunciado for p in lista}
+        assert len(enunciados) == len(lista), (
+            f"{chave}: {len(lista)} enunciados mas só {len(enunciados)} distintos"
+        )
+
+
 def test_pergunta_dataclass_frozen():
     p = Pergunta(
         camada="estrutura",
