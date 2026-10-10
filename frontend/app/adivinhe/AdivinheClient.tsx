@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAdivinheRodada } from "@/hooks/useAdivinheRodada";
+import { useAtalhosRodada } from "@/hooks/useAtalhosRodada";
 import { StepControls } from "@/components/ui/StepControls";
 import { StepNarrator } from "@/components/ui/StepNarrator";
 import { PassosGenericoVisual } from "@/components/jogo/PassosGenericoVisual";
@@ -62,6 +63,28 @@ export function AdivinheClient({ seedInicial }: Props) {
   const onProxima = useCallback(() => {
     void proximaRodada();
   }, [proximaRodada]);
+
+  useAtalhosRodada(
+    {
+      onNumero: (idx) => {
+        if (estado !== "respondendo" || perguntaAtual === null) return;
+        setSelecionada(idx);
+      },
+      onConfirmar: () => {
+        if (estado !== "respondendo" || selecionada === null || enviando) return;
+        void onConfirmar();
+      },
+      onEsquerda: () => {
+        if (estado !== "respondendo") return;
+        voltar();
+      },
+      onDireita: () => {
+        if (estado !== "respondendo") return;
+        avancar();
+      },
+    },
+    [estado, perguntaAtual, selecionada, enviando, onConfirmar, voltar, avancar]
+  );
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
