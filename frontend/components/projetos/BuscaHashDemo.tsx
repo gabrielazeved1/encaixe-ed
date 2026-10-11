@@ -27,7 +27,6 @@ function construirTabela(): [string, string][][] {
 
 export function BuscaHashDemo() {
   const [chave, setChave] = useState<string>("rust");
-  const [mostrarPassos, setMostrarPassos] = useState(false);
   const { resultado, loading, erro, simular } = useBuscaHash();
 
   const tabelaPreview = useMemo(() => construirTabela(), []);
@@ -37,7 +36,6 @@ export function BuscaHashDemo() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!chave.trim()) return;
-    setMostrarPassos(false);
     await simular(chave.trim(), LINGUAGENS);
   }
 
@@ -127,12 +125,7 @@ export function BuscaHashDemo() {
       {erro && <p className="text-red-400 text-sm">{erro}</p>}
 
       {resultado && (
-        <ResultadoBusca
-          resultado={resultado}
-          chave={chave}
-          mostrarPassos={mostrarPassos}
-          onTogglePassos={() => setMostrarPassos((v) => !v)}
-        />
+        <ResultadoBusca resultado={resultado} chave={chave} />
       )}
     </div>
   );
@@ -203,17 +196,107 @@ function TabelaHashPreview({
   );
 }
 
+function BuscaLinearVisual({ chave, comparacoes, encontrado }: {
+  chave: string;
+  comparacoes: number;
+  encontrado: boolean;
+}) {
+  const itens = LINGUAGENS.map((l) => l.chave);
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[10px] font-mono text-slate-500">
+        busca linear · percorrendo na ordem de inserção:
+      </p>
+      <div className="flex flex-wrap gap-1">
+        {itens.map((item, i) => {
+          const posicao = i + 1;
+          const eAlvo = item === chave;
+          const foiVerificado = posicao <= comparacoes;
+          const eNaoEncontrado = foiVerificado && !eAlvo && !encontrado;
+
+          if (!foiVerificado) {
+            return (
+              <span key={item}
+                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-900 border border-slate-800 text-slate-600"
+              >
+                {item}
+              </span>
+            );
+          }
+          if (eAlvo && encontrado) {
+            return (
+              <span key={item}
+                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-green-900/50 border border-green-500/60 text-green-300 font-bold"
+                title={`${posicao}ª comparação — encontrado`}
+              >
+                {item} ✓
+              </span>
+            );
+          }
+          return (
+            <span key={item}
+              className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-900 border border-slate-700 text-slate-600 line-through"
+              title={`${posicao}ª comparação — não é`}
+            >
+              {item}
+            </span>
+          );
+        })}
+      </div>
+      <p className="text-[10px] font-mono text-slate-500">
+        {encontrado
+          ? `"${chave}" estava na posição ${comparacoes} da lista → ${comparacoes} comparações`
+          : `"${chave}" não está na lista → percorreu todos os ${comparacoes} itens`}
+      </p>
+    </div>
+  );
+}
+
+function MapeamentoHash({ chave }: { chave: string }) {
+  const itens = LINGUAGENS.map((l) => l.chave);
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[10px] font-mono text-slate-500">
+        como a função hash distribui cada linguagem:
+        <span className="ml-1 text-slate-600">h(chave) = (31·h + ord(c)) % 16</span>
+      </p>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+        {itens.map((item) => {
+          const bucket = computeHash(item);
+          const eAlvo = item === chave;
+          return (
+            <div key={item}
+              className={`flex items-center gap-2 py-0.5 px-1.5 rounded text-[10px] font-mono ${
+                eAlvo ? "bg-blue-900/30 border border-blue-500/30" : ""
+              }`}
+            >
+              <span className={`w-20 truncate ${eAlvo ? "text-orange-300 font-bold" : "text-slate-400"}`}>
+                {item}
+              </span>
+              <span className="text-slate-600">→</span>
+              <span className={`w-6 text-center ${eAlvo ? "text-blue-300 font-bold" : "text-slate-500"}`}>
+                [{bucket}]
+              </span>
+              {eAlvo && <span className="text-[9px] text-blue-400">← aqui</span>}
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] font-mono text-slate-600">
+        cada chave vai diretamente para seu bucket — sem percorrer a lista
+      </p>
+    </div>
+  );
+}
+
 function ResultadoBusca({
   resultado,
   chave,
-  mostrarPassos,
-  onTogglePassos,
 }: {
   resultado: ReturnType<typeof useBuscaHash>["resultado"];
   chave: string;
-  mostrarPassos: boolean;
-  onTogglePassos: () => void;
 }) {
+  const [aba, setAba] = useState<"linear" | "hash">("linear");
   if (!resultado) return null;
   const { linear, hash } = resultado;
   const max = Math.max(linear.comparacoes, hash.comparacoes, 1);
@@ -224,7 +307,13 @@ function ResultadoBusca({
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-lg border border-orange-500/40 bg-[#0d1117] p-3 space-y-2">
+        <button type="button" onClick={() => setAba("linear")}
+          className={`rounded-lg border p-3 space-y-2 text-left transition-colors ${
+            aba === "linear"
+              ? "border-orange-500/60 bg-orange-900/20"
+              : "border-orange-500/20 bg-[#0d1117] hover:border-orange-500/40"
+          }`}
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-orange-400">
               Busca Linear
@@ -239,15 +328,18 @@ function ResultadoBusca({
             <div className="h-full bg-orange-500 transition-all"
               style={{ width: `${(linear.comparacoes / max) * 100}%` }} />
           </div>
-          <p className="text-[10px] font-mono text-slate-500">
-            percorre item a item{" "}
-            <span className={linear.encontrado ? "text-green-400" : "text-red-400"}>
-              {linear.encontrado ? "→ encontrou" : "→ não encontrou"}
-            </span>
+          <p className="text-[10px] font-mono text-orange-400/70">
+            {aba === "linear" ? "▾ ver percurso" : "clique para ver"}
           </p>
-        </div>
+        </button>
 
-        <div className="rounded-lg border border-blue-500/40 bg-[#0d1117] p-3 space-y-2">
+        <button type="button" onClick={() => setAba("hash")}
+          className={`rounded-lg border p-3 space-y-2 text-left transition-colors ${
+            aba === "hash"
+              ? "border-blue-500/60 bg-blue-900/20"
+              : "border-blue-500/20 bg-[#0d1117] hover:border-blue-500/40"
+          }`}
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-400">
               Hash Table
@@ -262,13 +354,10 @@ function ResultadoBusca({
             <div className="h-full bg-blue-500 transition-all"
               style={{ width: `${(hash.comparacoes / max) * 100}%` }} />
           </div>
-          <p className="text-[10px] font-mono text-slate-500">
-            h(&quot;{chave}&quot;) → [{hash.indice}]{" "}
-            <span className={hash.encontrado ? "text-green-400" : "text-red-400"}>
-              {hash.encontrado ? "→ encontrou" : "→ não encontrou"}
-            </span>
+          <p className="text-[10px] font-mono text-blue-400/70">
+            {aba === "hash" ? "▾ ver mapeamento" : "clique para ver"}
           </p>
-        </div>
+        </button>
       </div>
 
       {hash.comparacoes < linear.comparacoes && (
@@ -277,19 +366,17 @@ function ResultadoBusca({
         </div>
       )}
 
-      <button type="button" onClick={onTogglePassos}
-        className="w-full text-xs font-mono text-slate-500 hover:text-slate-300 transition-colors py-1.5 rounded border border-slate-800 hover:border-slate-600"
-      >
-        {mostrarPassos ? "↑ ocultar passos internos" : "↓ ver como a hash table foi construída"}
-      </button>
-
-      {mostrarPassos && (
-        <BuscaHashVisual
-          passos={resultado.passos}
-          resumo={resultado}
-          chave={chave}
-        />
-      )}
+      <div className="rounded-lg border border-slate-700 bg-[#0d1117] p-3">
+        {aba === "linear" ? (
+          <BuscaLinearVisual
+            chave={chave}
+            comparacoes={linear.comparacoes}
+            encontrado={linear.encontrado}
+          />
+        ) : (
+          <MapeamentoHash chave={chave} />
+        )}
+      </div>
     </div>
   );
 }
