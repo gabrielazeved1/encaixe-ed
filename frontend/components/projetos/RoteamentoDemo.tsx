@@ -180,7 +180,7 @@ export function EmptyStateGrafo({
   const displayArestas = arestas ?? PRESET_ARESTAS;
 
   const n = displayNos.length;
-  const cx = 130, cy = 100, r = 80;
+  const cx = 160, cy = 125, r = 100;
   const posicoes: Record<string, { x: number; y: number }> = {};
   displayNos.forEach((no, i) => {
     const ang = (2 * Math.PI * i) / n - Math.PI / 2;
@@ -204,7 +204,7 @@ export function EmptyStateGrafo({
       <p className="text-xs font-mono text-slate-500 text-center">
         {cor === "purple" ? "grafo ponderado · Dijkstra" : "grafo não ponderado · BFS"}
       </p>
-      <svg viewBox="0 0 260 200" className="w-full max-w-xs mx-auto">
+      <svg viewBox="0 0 320 250" className="w-full max-w-sm mx-auto">
         {arestasUnicas.map((a) => {
           const pa = posicoes[a.origem];
           const pb = posicoes[a.destino];

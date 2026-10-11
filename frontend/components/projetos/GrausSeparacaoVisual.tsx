@@ -16,9 +16,9 @@ type Ponto = { x: number; y: number };
 
 function calcularPosicoes(pessoas: Pessoa[]): Record<string, Ponto> {
   const n = pessoas.length;
-  const cx = 160;
-  const cy = 130;
-  const r = 100;
+  const cx = 200;
+  const cy = 160;
+  const r = 130;
   const posicoes: Record<string, Ponto> = {};
   pessoas.forEach((p, i) => {
     const angulo = (2 * Math.PI * i) / n - Math.PI / 2;
@@ -129,7 +129,7 @@ function GrafoSVG({
   }, [caminho]);
 
   return (
-    <svg viewBox="0 0 320 260" className="w-full max-w-xs mx-auto">
+    <svg viewBox="0 0 400 320" className="w-full max-w-md mx-auto">
       {amizades.map((a) => {
         const pa = posicoes[a.a];
         const pb = posicoes[a.b];

@@ -17,7 +17,7 @@ type Ponto = { x: number; y: number };
 
 function calcularPosicoes(nos: string[]): Record<string, Ponto> {
   const n = nos.length;
-  const cx = 160, cy = 140, r = 108;
+  const cx = 200, cy = 175, r = 145;
   const pos: Record<string, Ponto> = {};
   nos.forEach((no, i) => {
     const ang = (2 * Math.PI * i) / n - Math.PI / 2;
@@ -81,7 +81,7 @@ function GrafoSVG({
   }, [arestas]);
 
   return (
-    <svg viewBox="0 0 320 280" className="w-full max-w-sm mx-auto">
+    <svg viewBox="0 0 400 350" className="w-full max-w-md mx-auto">
       {arestasDraw.map((a) => {
         const pa = posicoes[a.origem];
         const pb = posicoes[a.destino];

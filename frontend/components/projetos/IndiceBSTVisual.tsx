@@ -38,8 +38,8 @@ function posicionarNos(
   if (no === null) return;
   acc.push({ valor: no.valor, x, y, pai });
   const prox = passoX / 2;
-  posicionarNos(no.esq, x - passoX, y + 42, prox, { x, y }, acc);
-  posicionarNos(no.dir, x + passoX, y + 42, prox, { x, y }, acc);
+  posicionarNos(no.esq, x - passoX, y + 56, prox, { x, y }, acc);
+  posicionarNos(no.dir, x + passoX, y + 56, prox, { x, y }, acc);
 }
 
 function profundidade(no: NoBst): number {
@@ -62,11 +62,11 @@ function TreeView({
     );
   }
   const d = profundidade(arvore);
-  const largura = Math.max(200, 2 ** d * 32);
-  const altura = d * 44 + 20;
+  const largura = Math.max(240, 2 ** d * 40);
+  const altura = d * 56 + 28;
   const passoInicial = largura / 4;
   const nos: NoPosicionado[] = [];
-  posicionarNos(arvore, largura / 2, 20, passoInicial, undefined, nos);
+  posicionarNos(arvore, largura / 2, 28, passoInicial, undefined, nos);
 
   return (
     <svg
@@ -97,7 +97,7 @@ function TreeView({
             <circle
               cx={n.x}
               cy={n.y}
-              r={14}
+              r={17}
               fill={alvo ? "rgb(30 64 175)" : "rgb(19 78 74)"}
               stroke={alvo ? "rgb(96 165 250)" : "rgb(45 212 191)"}
               strokeWidth={alvo ? "2.5" : "1.5"}
@@ -108,7 +108,7 @@ function TreeView({
               y={n.y + 4}
               textAnchor="middle"
               fill={alvo ? "rgb(219 234 254)" : "rgb(204 251 241)"}
-              fontSize="11"
+              fontSize="12"
               fontFamily="monospace"
             >
               {n.valor}
@@ -129,7 +129,7 @@ export function IndiceBSTVisual({ passos }: Props) {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-[1fr_minmax(14rem,22rem)]">
-        <div className="min-h-56 rounded-lg border border-slate-700 bg-[#0d1117] p-4">
+        <div className="min-h-72 rounded-lg border border-slate-700 bg-[#0d1117] p-4">
           <TreeView arvore={arvore} destacados={destacados} />
         </div>
 

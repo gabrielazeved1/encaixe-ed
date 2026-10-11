@@ -95,7 +95,7 @@ export const projetos: Projeto[] = [
 
 A pilha tem limite de 50 frames. Se você pedir fibonacci(51), ela estoura — e você verá o evento "overflow" acontecer em tempo real.
 
-No dia a dia: toda linguagem de programação tem uma call stack exatamente assim. O stack trace que aparece quando um programa lança uma exceção é essa pilha sendo impressa. Python, Java, JavaScript — todos usam esse mecanismo. Em Sistemas Operacionais você vai ver que o SO aloca uma região de memória chamada stack para cada thread, com tamanho limitado (tipicamente 1–8 MB).
+No dia a dia: abra o Chrome DevTools → aba Sources → pause em qualquer breakpoint. O painel "Call Stack" que aparece à direita é essa mesma pilha sendo exibida. O Ctrl+Z (desfazer) em editores como o VS Code mantém uma pilha de operações — cada edição empilha, cada Ctrl+Z desempilha. O botão "Voltar" do browser também é uma pilha de URLs visitadas. Stack overflow que você encontra no nome do site famoso vem exatamente daí — quando a pilha de chamadas transborda.
 
 A visualização aqui funciona em modo passo-a-passo: dispare uma simulação e navegue manualmente ou use o autoplay para ver cada push e pop com descrição em linguagem natural.`,
   },
@@ -119,7 +119,7 @@ No Round-Robin, todos os processos entram numa fila FIFO. Cada um recebe uma fat
 
 No modo Prioridade, usamos um heap mínimo: a cada passo, o processo com menor número de prioridade (= mais urgente) é sempre escolhido primeiro, independente da ordem de chegada. O número 1 é a maior prioridade.
 
-No dia a dia: o escalonador de CPU do Linux usa variações desses mesmos algoritmos — CFS (Completely Fair Scheduler) para processos normais e filas de prioridade real-time para processos críticos do sistema. Em Sistemas Operacionais você vai estudar exatamente esses dois modelos.`,
+No dia a dia: abra o Activity Monitor (macOS) ou o Gerenciador de Tarefas (Windows) e olhe a coluna "% CPU" — o SO está rodando um escalonador por trás para decidir qual processo ocupa o processador em cada fatia de tempo. O driver de áudio do seu computador usa fila de prioridade real-time para nunca ter jitter no som (latência < 5ms). Jogos pedem para o Windows elevarem sua prioridade no heap para garantir framerate. Em servidores, filas de mensagem como RabbitMQ e Kafka implementam prioridade de consumo com a mesma estrutura de heap.`,
     operacoes: [
       "enqueue(x) — adiciona ao fim",
       "dequeue() — remove o primeiro",
@@ -151,7 +151,7 @@ No dia a dia: o escalonador de CPU do Linux usa variações desses mesmos algori
 
 A implementação usa um grafo de lista de adjacência e um MinHeap para sempre expandir o nó de menor custo acumulado. Você vê cada passo: qual nó foi visitado, com qual custo, e por qual caminho chegou lá.
 
-No dia a dia: o protocolo OSPF, usado em roteadores reais da internet, roda Dijkstra para calcular a tabela de roteamento de cada equipamento. Quando um pacote sai do seu computador e passa por vários roteadores até chegar ao destino, cada roteador tomou sua decisão baseado nessa mesma lógica. Em Redes de Computadores você vai ver OSPF em detalhe.`,
+No dia a dia: quando você pede para o Google Maps ou Waze encontrar a rota mais rápida, por baixo está rodando uma variante de Dijkstra (ou A*) sobre um grafo de centenas de milhares de intersecções. O protocolo OSPF, usado em roteadores reais da internet, roda Dijkstra para calcular a tabela de roteamento de cada equipamento. Apps de delivery como iFood e Uber calculam o custo de cada entregador até você usando o mesmo princípio. Quando um pacote sai do seu computador e passa por 10 roteadores até chegar ao destino, cada salto foi decidido com base nessa lógica.`,
     operacoes: [
       "add_no(n) — adiciona vértice",
       "add_aresta(u, v, c) — aresta com custo c",
@@ -182,7 +182,7 @@ No dia a dia: o protocolo OSPF, usado em roteadores reais da internet, roda Dijk
 
 A implementação usa uma fila (deque do Python) para controlar a ordem de visitação. Você vê os níveis sendo revelados: nível 0 é a origem, nível 1 são os amigos diretos, nível 2 os amigos de amigos, e assim por diante.
 
-No dia a dia: LinkedIn mostra "2º grau" ou "3º grau" usando BFS sobre o grafo de conexões. O Facebook calculou em 2016 que a distância média entre quaisquer dois usuários era 3,57 graus. Em Teoria dos Grafos você vai provar formalmente por que BFS garante o caminho mínimo em grafos sem pesos.`,
+No dia a dia: o "2º grau" e "3º grau" que o LinkedIn mostra no seu perfil são calculados com BFS exatamente assim. "Pessoas que você talvez conheça" no Facebook e "Quem seguir" no Twitter vêm da mesma lógica — o sistema encontra quem está a 2 saltos de você no grafo de conexões. O Facebook calculou em 2016 que a distância média entre quaisquer dois de seus 1,5 bilhão de usuários era 3,57 graus — comprovando experimentalmente a "teoria dos seis graus". O jogo "The Oracle of Bacon" (o ator Kevin Bacon como hub do cinema) é a mesma ideia aplicada a coestrelações de filmes.`,
     operacoes: [
       "add_no(n) — adiciona pessoa",
       "add_aresta(a, b) — adiciona amizade",
@@ -201,16 +201,21 @@ No dia a dia: LinkedIn mostra "2º grau" ou "3º grau" usando BFS sobre o grafo 
       {
         nome: "Banco de Dados",
         relacao:
-          "Índices de banco de dados (hash indexes no PostgreSQL, por exemplo) usam tabelas hash para tornar buscas por chave exata O(1) — a diferença de desempenho contra uma varredura sequencial (full table scan) é drástica em tabelas grandes.",
+          "Índices hash do PostgreSQL tornam buscas por igualdade exata O(1) — mas só funcionam para '=', não para '>', '<' ou LIKE. Hash indexes são criados com CREATE INDEX USING HASH. Para buscas por intervalo, o banco usa B-Tree (árvore) em vez de hash.",
+      },
+      {
+        nome: "Linguagens de Programação",
+        relacao:
+          "Dicionários Python, objetos JavaScript, HashMap em Java e std::unordered_map em C++ são todos hash tables. A complexidade O(1) amortizada de dict['chave'] é exatamente o que você vê aqui. Entender colisões explica por que hash tables degeneradas (todas chaves no mesmo bucket) viram O(n).",
       },
     ],
-    textoEd: `Neste projeto a base tem 20 registros (registro_001 a registro_020). Você busca uma chave e vê lado a lado: quantas comparações a busca linear precisou (percorre do início até achar) versus quantas a hash table precisou (calcula o índice direto pela função hash).
+    textoEd: `Neste projeto a base tem 16 linguagens de programação. Você busca uma delas e vê lado a lado: quantas comparações a busca linear precisou (percorre na ordem de inserção do 1º ao 16º até achar) versus quantas a hash table precisou (calcula o índice direto pela função hash e vai direto ao bucket).
 
-A função hash usada é polynomial rolling hash — multiplica cada caractere pela sua posição e tira o módulo pelo tamanho da tabela. Colisões são resolvidas por encadeamento (chaining): o bucket vira uma lista. Daí por que às vezes o hash precisa de mais de 1 comparação.
+A função hash usada é polynomial rolling hash — combina cada caractere da chave e tira o módulo pelo tamanho da tabela (16 buckets). Colisões são resolvidas por encadeamento (chaining): quando dois valores caem no mesmo bucket, formam uma lista. Daí por que às vezes o hash precisa de mais de 1 comparação.
 
-No dia a dia: índices hash do PostgreSQL funcionam exatamente assim para buscas por igualdade exata (WHERE id = 42). Dicionários do Python e objetos do JavaScript são hash tables por baixo. Quando você acessa dados em O(1) em qualquer dessas linguagens, é esse mecanismo rodando.
+Atenção: a posição de uma linguagem na lista de inserção (1 a 16) é completamente diferente do número do bucket dela na tabela hash (0 a 15). "haskell" é o 14º da lista — por isso busca linear faz 14 comparações — mas a função hash a coloca no bucket [3], chegando em 1 ou 2 comparações.
 
-A visualização aqui funciona em modo passo-a-passo: a tabela nasce vazia e cada inserção vai acendendo o bucket alvo — colisões ficam explícitas no narrador lateral. Você pode pausar entre dois passos para inspecionar como a chain cresceu antes da busca começar.`,
+No dia a dia: dicionários Python ({}) e objetos JavaScript ({}) são hash tables — cada chave acessa o valor em O(1). Redis, o banco de dados em memória mais usado do mundo, armazena todos os seus pares chave-valor numa hash table gigante. DNS resolve domínios para IPs usando cache baseado em hash. Índices hash do PostgreSQL funcionam assim para buscas por igualdade exata (WHERE email = '...').`,
     operacoes: [
       "inserir(chave, valor) — insere no bucket hash(chave)",
       "buscar(chave) — acesso O(1) esperado",
@@ -229,23 +234,21 @@ A visualização aqui funciona em modo passo-a-passo: a tabela nasce vazia e cad
       {
         nome: "Banco de Dados",
         relacao:
-          "Índices B-Tree do PostgreSQL/MySQL são primas maiores da BST: mantêm os dados ordenados hierarquicamente para eliminar metade dos candidatos a cada comparação, em vez de varredura linha por linha.",
+          "Índices B-Tree do PostgreSQL/MySQL são a evolução direta da BST: funcionam para '=', '>', '<', BETWEEN e ORDER BY. Sem índice = Seq Scan (linear). Com índice = Index Scan (logarítmico). EXPLAIN ANALYZE numa query lenta vai mostrar exatamente essa diferença.",
       },
       {
         nome: "Algoritmos e Estruturas de Dados",
         relacao:
-          "A BST é a estrutura base para entender busca binária em estruturas dinâmicas — cada comparação reduz o espaço de busca pela metade, dando O(log n) esperado.",
+          "A BST explica por que inserir valores em ordem aleatória é melhor que em ordem crescente para performance. Árvores AVL e Red-Black (que você vai ver na disciplina) resolvem a degeneração com rotações automáticas — mas a BST simples aqui deixa a mecânica visível sem ruído.",
       },
     ],
     textoEd: `Neste projeto você insere os valores na ordem que quiser — e a ordem importa. Os mesmos números inseridos em ordens diferentes geram árvores com formatos completamente diferentes (e desempenhos diferentes). Depois você busca um valor e vê cada decisão: "alvo menor → desce à esquerda", "alvo maior → desce à direita".
 
-O resultado mostra lado a lado: quantas comparações a BST precisou vs. uma varredura linear. Para a árvore do exemplo (7 nós balanceados), a BST chega em qualquer valor em no máximo 3 comparações. Linear pode precisar de 7.
+O resultado mostra lado a lado: quantas comparações a BST precisou vs. uma varredura linear na ordem de inserção. Para a árvore do exemplo (7 nós balanceados), a BST chega em qualquer valor em no máximo 3 comparações. Linear pode precisar de 7.
 
-**Pior caso:** esta BST não rebalanceia. Se os valores forem inseridos em ordem crescente (1, 2, 3, 4...) ou decrescente, a árvore degenera em uma estrutura equivalente a uma lista encadeada — cada nó só tem filho de um lado — e a busca passa a custar O(n), igual à varredura linear. Em cenários reais usamos árvores balanceadas (AVL, Red-Black, B-Tree) para evitar essa degeneração; aqui focamos na BST pura para ver a mecânica sem o ruído do balanceamento.
+Pior caso: esta BST não rebalanceia. Se os valores forem inseridos em ordem crescente (1, 2, 3, 4...) ou decrescente, a árvore degenera em uma estrutura equivalente a uma lista encadeada — cada nó só tem filho de um lado — e a busca passa a custar O(n), igual à varredura linear. Tente inserir "1,2,3,4,5,6,7" e observe. Em cenários reais usamos árvores balanceadas (AVL, Red-Black, B-Tree) para evitar essa degeneração.
 
-No dia a dia: índices B-Tree do PostgreSQL e MySQL são a evolução direta da BST — árvores com múltiplos filhos por nó para reduzir a altura e os acessos a disco. Quando você faz SELECT sem índice, o banco faz varredura linear. Com índice B-Tree, faz busca logarítmica. Em Banco de Dados você vai entender por que criar índices nos campos de busca frequente é uma das otimizações mais importantes.
-
-A visualização aqui funciona em modo passo-a-passo: cada inserção e cada comparação da busca viram um passo com descrição em pt-BR. Dá para avançar manualmente ou deixar o autoplay rodar para ver a árvore nascendo nó a nó.`,
+No dia a dia: quando você roda SELECT * FROM usuarios WHERE email = 'joao@...' sem índice, o banco faz varredura linear em toda a tabela — igual à busca linear aqui. Com um índice B-Tree criado nessa coluna (CREATE INDEX), a busca se torna logarítmica. Em tabelas com milhões de linhas, essa diferença é de segundos para milissegundos. O comando EXPLAIN ANALYZE do PostgreSQL mostra exatamente essa decisão: "Seq Scan" (linear) vs "Index Scan" (árvore). Criar índices nos campos de busca frequente é uma das otimizações mais impactantes que um desenvolvedor backend pode fazer.`,
     operacoes: [
       "inserir(v) — posiciona mantendo BST property",
       "buscar(v) — O(log n) esperado",
@@ -272,7 +275,7 @@ A visualização aqui funciona em modo passo-a-passo: cada inserção e cada com
 
 A barra mostra o estado em tempo real: verde = livre, vermelho = usado. O índice de fragmentação sobe quando você aloca e libera blocos de tamanhos variados — mesmo com memória livre total, pode não existir um bloco contíguo grande o suficiente para uma nova alocação.
 
-No dia a dia: malloc() e free() do C fazem exatamente isso. O heap do seu processo é gerenciado por um alocador (glibc usa uma variante chamada ptmalloc) com a mesma lista encadeada de blocos livres. Em Sistemas Operacionais você vai ver por que fragmentação é um problema real e as estratégias (best-fit, worst-fit, compactação) para mitigá-la.`,
+No dia a dia: malloc() e free() do C são exatamente esse alocador. "Memory leak" é quando você chama malloc() mas esquece o free() — os blocos ficam marcados como usados para sempre e a memória do processo cresce sem parar até travar. Jogos antigos (e alguns novos) travam após algumas horas de uso por memory leaks acumulados. Python, Java e Go têm garbage collector que chama free() automaticamente, mas isso tem custo de CPU. Rust elimina o problema na compilação com o sistema de ownership — o compilador sabe exatamente quando liberar cada bloco sem precisar de GC. Na prática, 80% dos bugs de segurança históricos do C/C++ vêm de erros nesse mecanismo (use-after-free, buffer overflow).`,
     operacoes: [
       "alocar(tamanho) — first-fit na free list",
       "liberar(bloco_id) — devolve à free list",

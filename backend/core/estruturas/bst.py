@@ -138,10 +138,9 @@ def simular_bst(valores: list[int], alvo: int) -> ResultadoDict:
     for v in valores:
         arvore.inserir(v, coletor)
     resultado = arvore.buscar(alvo, coletor)
-    sorted_vals = sorted(set(valores))
     linear_comp = next(
-        (i + 1 for i, v in enumerate(sorted_vals) if v == alvo),
-        len(sorted_vals),
+        (i + 1 for i, v in enumerate(valores) if v == alvo),
+        len(valores),
     )
     passos_busca = resultado["passos"]
     assert isinstance(passos_busca, list)
