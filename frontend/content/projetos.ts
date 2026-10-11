@@ -90,6 +90,11 @@ export const projetos: Projeto[] = [
         relacao:
           "O SO aloca uma região de memória chamada stack para cada thread do processo. O tamanho é limitado — estourar esse limite é o famoso stack overflow.",
       },
+      {
+        nome: "Sistemas Distribuídos",
+        relacao:
+          "Distributed tracing (OpenTelemetry, Jaeger, Zipkin) representa chamadas entre microserviços como uma árvore de spans — a call stack distribuída entre dezenas de serviços. Quando um request passa por API Gateway → Auth → DB, cada salto vira um span. Ferramentas como Datadog e New Relic mostram essa 'pilha distribuída' visualmente para diagnosticar latência em sistemas com centenas de microserviços.",
+      },
     ],
     textoEd: `Neste projeto implementamos uma pilha em Python puro e a usamos para simular a call stack real de funções recursivas — fatorial e fibonacci. A cada chamada, um novo frame é empilhado com o nome da função, o argumento e a profundidade. Quando a função retorna, o frame sai com o valor calculado.
 
@@ -111,6 +116,11 @@ A visualização aqui funciona em modo passo-a-passo: dispare uma simulação e 
         nome: "Sistemas Operacionais",
         relacao:
           "O SO usa exatamente essas duas estruturas para decidir qual processo roda a seguir: fila FIFO para Round-Robin (todos iguais, na ordem de chegada) e heap de prioridade quando processos têm urgências diferentes.",
+      },
+      {
+        nome: "Sistemas Distribuídos",
+        relacao:
+          "O Kubernetes usa um scheduler com fila de prioridade para decidir em qual nó do cluster cada Pod vai rodar. Apache YARN (Hadoop) e Mesos implementam o mesmo modelo para jobs distribuídos. Celery e RQ (filas de tarefas em Python) são Round-Robin distribuído. Compreender o modelo aqui é pré-requisito direto para entender como clusters distribuem e priorizam carga de trabalho.",
       },
     ],
     textoEd: `Neste projeto implementamos dois algoritmos de escalonamento em Python: Round-Robin usando uma Fila (Queue), e escalonamento por Prioridade usando um MinHeap.
@@ -146,6 +156,11 @@ No dia a dia: abra o Activity Monitor (macOS) ou o Gerenciador de Tarefas (Windo
         relacao:
           "Dijkstra é o algoritmo canônico de caminho mínimo em grafos ponderados com arestas de peso não-negativo, com complexidade O((V + E) log V) com heap.",
       },
+      {
+        nome: "Sistemas Distribuídos",
+        relacao:
+          "BGP (Border Gateway Protocol) roteia tráfego entre sistemas autônomos (ISPs, datacenters) na internet — é Dijkstra/Bellman-Ford rodando de forma distribuída em milhares de roteadores simultaneamente. CDNs como Cloudflare usam grafos ponderados para decidir de qual edge server servir cada request. Em sistemas de microsserviços, service meshes (Istio, Linkerd) aplicam roteamento por grafo para balancear tráfego entre instâncias.",
+      },
     ],
     textoEd: `Neste projeto você monta uma rede de roteadores: define os nós (roteadores) e os links entre eles com seus custos (latência, distância, etc). O algoritmo de Dijkstra encontra a rota de menor custo total entre origem e destino.
 
@@ -177,6 +192,11 @@ No dia a dia: quando você pede para o Google Maps ou Waze encontrar a rota mais
         relacao:
           "A descoberta de topologia em redes (como o protocolo STP usa BFS para construir a árvore geradora mínima) segue o mesmo princípio de exploração em camadas.",
       },
+      {
+        nome: "Sistemas Distribuídos",
+        relacao:
+          "Google Pregel (2010) e Apache Giraph rodam BFS sobre grafos com trilhões de arestas distribuídos em centenas de máquinas — é como o Facebook calcula graus de separação para 3 bilhões de usuários. O modelo 'vertex-centric' envia mensagens entre nós em paralelo, rodando BFS em escala planetária. PageRank (algoritmo original do Google) usa a mesma topologia de grafo processada de forma distribuída.",
+      },
     ],
     textoEd: `Neste projeto a rede de amizades é um grafo não ponderado: cada pessoa é um nó, cada amizade é uma aresta sem peso. O BFS (Busca em Largura) explora camada por camada — primeiro os amigos diretos, depois os amigos dos amigos — garantindo encontrar o menor número de conexões entre duas pessoas.
 
@@ -207,6 +227,11 @@ No dia a dia: o "2º grau" e "3º grau" que o LinkedIn mostra no seu perfil são
         nome: "Linguagens de Programação",
         relacao:
           "Dicionários Python, objetos JavaScript, HashMap em Java e std::unordered_map em C++ são todos hash tables. A complexidade O(1) amortizada de dict['chave'] é exatamente o que você vê aqui. Entender colisões explica por que hash tables degeneradas (todas chaves no mesmo bucket) viram O(n).",
+      },
+      {
+        nome: "Sistemas Distribuídos",
+        relacao:
+          "DHT (Distributed Hash Table) — Chord, Kademlia, Amazon Dynamo — generaliza a hash table para centenas de máquinas: a função hash decide em qual nó do cluster cada chave mora (consistent hashing). Cassandra e DynamoDB usam consistent hashing com virtual nodes para distribuir dados sem ponto único de falha. BitTorrent usa Kademlia para localizar peers sem servidor central. Entender como a função hash distribui chaves aqui é o fundamento direto de como dados são particionados em sistemas distribuídos.",
       },
     ],
     textoEd: `Neste projeto a base tem 16 linguagens de programação. Você busca uma delas e vê lado a lado: quantas comparações a busca linear precisou (percorre na ordem de inserção do 1º ao 16º até achar) versus quantas a hash table precisou (calcula o índice direto pela função hash e vai direto ao bucket).
@@ -241,6 +266,11 @@ No dia a dia: dicionários Python ({}) e objetos JavaScript ({}) são hash table
         relacao:
           "A BST explica por que inserir valores em ordem aleatória é melhor que em ordem crescente para performance. Árvores AVL e Red-Black (que você vai ver na disciplina) resolvem a degeneração com rotações automáticas — mas a BST simples aqui deixa a mecânica visível sem ruído.",
       },
+      {
+        nome: "Sistemas Distribuídos",
+        relacao:
+          "Google Bigtable e Apache HBase armazenam dados em árvores B distribuídas entre servidores — cada tablet server mantém uma subárvore do índice global. Google Spanner replica índices B-Tree entre datacenters com consistência forte. CockroachDB e TiDB são implementações distribuídas do PostgreSQL onde o índice B-Tree é replicado via Raft. Entender por que a BST degenerada se torna O(n) explica por que rebalancear é crítico quando o índice está espalhado por dezenas de nós.",
+      },
     ],
     textoEd: `Neste projeto você insere os valores na ordem que quiser — e a ordem importa. Os mesmos números inseridos em ordens diferentes geram árvores com formatos completamente diferentes (e desempenhos diferentes). Depois você busca um valor e vê cada decisão: "alvo menor → desce à esquerda", "alvo maior → desce à direita".
 
@@ -269,6 +299,11 @@ No dia a dia: quando você roda SELECT * FROM usuarios WHERE email = 'joao@...' 
         nome: "Sistemas Operacionais",
         relacao:
           "malloc() e free() do C (e internamente o heap do seu processo) mantêm uma free list — lista encadeada de blocos livres. Fragmentação externa acontece quando os blocos livres ficam pequenos demais e espalhados para atender novas alocações.",
+      },
+      {
+        nome: "Sistemas Distribuídos",
+        relacao:
+          "Kubernetes gerencia memória de containers com cgroups — cada Pod tem um limite de memória que é rastreado como um bloco alocado no nó. Quando um Pod ultrapassa o limite, o OOMKiller age como o 'overflow' da pilha, encerrando o processo. Em clusters com dezenas de nós, o scheduler precisa encontrar um nó com memória livre suficiente — um problema de alocação distribuída. Apache Spark gerencia memória off-heap entre executores com um alocador similar ao first-fit para minimizar fragmentação.",
       },
     ],
     textoEd: `Neste projeto você tem 512 bytes de memória. Ao alocar, o alocador percorre a lista encadeada de blocos procurando o primeiro livre suficientemente grande (estratégia first-fit) e o divide em dois: um usado, um livre com o resto. Ao liberar, o bloco volta para a lista e o alocador funde blocos adjacentes livres (coalescing) para evitar que a memória fique picada.
