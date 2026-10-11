@@ -51,13 +51,30 @@ export function GrausSeparacaoDemo() {
 
   return (
     <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6">
-      <h2 className="text-base font-semibold text-white mb-5">
+      <h2 className="text-base font-semibold text-white mb-3">
         Demonstração interativa
       </h2>
 
-      <p className="text-sm text-slate-400 mb-4">
-        Rede pré-definida com {pessoas.length} pessoas e {amizades.length}{" "}
-        amizades.
+      <div className="rounded-lg border border-indigo-500/20 bg-indigo-900/10 px-4 py-3 text-xs text-slate-300 leading-relaxed space-y-1 mb-4">
+        <p>
+          <span className="text-indigo-300 font-semibold">Como funciona:</span>{" "}
+          cada pessoa é um nó do grafo; cada amizade é uma aresta (linha) sem
+          peso. O{" "}
+          <span className="text-white font-semibold">BFS (Busca em Largura)</span>{" "}
+          sai da origem e explora camada por camada — primeiro os amigos diretos
+          (nível 1), depois os amigos dos amigos (nível 2), e assim por diante.
+        </p>
+        <p>
+          Por explorar por camadas, o BFS{" "}
+          <span className="text-indigo-300">garante matematicamente</span> que o
+          primeiro caminho até o destino é sempre o de menor número de saltos —
+          exatamente o que o LinkedIn chama de "2º grau" ou "3º grau".
+        </p>
+      </div>
+
+      <p className="text-xs font-mono text-slate-500 mb-4">
+        Rede pré-definida · {pessoas.length} pessoas · {amizades.length}{" "}
+        amizades
       </p>
 
       <form onSubmit={handleSubmit} className="flex gap-3 flex-wrap items-end mb-6">

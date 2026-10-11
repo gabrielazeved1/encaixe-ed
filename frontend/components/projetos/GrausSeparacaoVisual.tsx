@@ -129,7 +129,7 @@ function GrafoSVG({
   }, [caminho]);
 
   return (
-    <svg viewBox="0 0 400 320" className="w-full max-w-md mx-auto">
+    <svg viewBox="0 0 400 320" className="w-full">
       {amizades.map((a) => {
         const pa = posicoes[a.a];
         const pb = posicoes[a.b];
@@ -142,7 +142,7 @@ function GrafoSVG({
             x1={pa.x} y1={pa.y}
             x2={pb.x} y2={pb.y}
             stroke={emPath ? "#34d399" : "#334155"}
-            strokeWidth={emPath ? 2.5 : 1.5}
+            strokeWidth={emPath ? 3 : 1.5}
             strokeLinecap="round"
             className="transition-all duration-300"
           />
@@ -178,15 +178,9 @@ function GrafoSVG({
 
         return (
           <g key={p.id} className="transition-all duration-300">
-            <circle
-              cx={pos.x} cy={pos.y} r={22}
-              fill={circleFill}
-              stroke={circleStroke}
-              strokeWidth={emCaminho || naFronteira ? 2.5 : 1.5}
-            />
             {(isOrigem || isDestino) && !emCaminho && (
               <circle
-                cx={pos.x} cy={pos.y} r={26}
+                cx={pos.x} cy={pos.y} r={30}
                 fill="none"
                 stroke={isOrigem ? "#f59e0b" : "#f43f5e"}
                 strokeWidth={1.5}
@@ -194,11 +188,17 @@ function GrafoSVG({
                 opacity={0.7}
               />
             )}
+            <circle
+              cx={pos.x} cy={pos.y} r={24}
+              fill={circleFill}
+              stroke={circleStroke}
+              strokeWidth={emCaminho || naFronteira ? 2.5 : 1.5}
+            />
             <text
               x={pos.x} y={pos.y + 1}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize={11}
+              fontSize={12}
               fontFamily="ui-monospace, monospace"
               fill={textColor}
               className="select-none"
@@ -250,123 +250,127 @@ export function GrausSeparacaoVisual({
 
   const podeAvancar = passo < passos.length - 1;
   const podeVoltar = passo > 0;
+  const isFinal = estadoAtual.mostrarCaminho;
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg bg-[#0d1117] border border-slate-700 p-3">
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <span className="text-xs font-mono text-slate-500">BFS — Busca em Largura</span>
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-            {graus} {graus === 1 ? "grau" : "graus"} de separação
-          </span>
-          <span className="ml-auto text-xs font-mono text-slate-600">
+    <div className="space-y-3">
+      <div className="rounded-lg bg-[#0d1117] border border-slate-700 p-3 space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-slate-500">BFS — Busca em Largura</span>
+            {isFinal && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                {graus} {graus === 1 ? "grau" : "graus"} de separação
+              </span>
+            )}
+          </div>
+          <span className="text-xs font-mono text-slate-600">
             passo {passo + 1} / {passos.length}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
-          <GrafoSVG
-            pessoas={pessoas}
-            amizades={amizades}
-            posicoes={posicoes}
-            visitados={estadoAtual.visitados}
-            fronteira={estadoAtual.fronteira}
-            caminho={caminho}
-            mostrarCaminho={estadoAtual.mostrarCaminho}
-            origem={origem}
-            destino={destino}
-          />
+        <GrafoSVG
+          pessoas={pessoas}
+          amizades={amizades}
+          posicoes={posicoes}
+          visitados={estadoAtual.visitados}
+          fronteira={estadoAtual.fronteira}
+          caminho={caminho}
+          mostrarCaminho={estadoAtual.mostrarCaminho}
+          origem={origem}
+          destino={destino}
+        />
 
-          <div className="space-y-3 min-w-[160px]">
-            <div className="rounded border border-slate-700 bg-slate-900/50 px-3 py-2 text-xs font-mono text-slate-300 leading-relaxed">
-              {estadoAtual.descricao}
+        <div className="rounded border border-slate-800 bg-slate-900/40 px-3 py-2 text-xs font-mono text-slate-300 min-h-[2.5rem]">
+          {estadoAtual.descricao}
+        </div>
+
+        {estadoAtual.filaExibida.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-mono text-slate-500 shrink-0">fila BFS:</span>
+            <div className="flex flex-wrap gap-1">
+              {estadoAtual.filaExibida.map((nome, i) => (
+                <span
+                  key={i}
+                  className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-indigo-900/40 border border-indigo-500/30 text-indigo-300"
+                >
+                  {nome}
+                </span>
+              ))}
             </div>
+          </div>
+        )}
 
-            {estadoAtual.filaExibida.length > 0 && (
-              <div>
-                <p className="text-[10px] font-mono text-slate-500 mb-1">fila BFS:</p>
-                <div className="flex flex-wrap gap-1">
-                  {estadoAtual.filaExibida.map((nome, i) => (
-                    <span
-                      key={i}
-                      className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-indigo-900/40 border border-indigo-500/30 text-indigo-300"
-                    >
-                      {nome}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {estadoAtual.mostrarCaminho && (
-              <div>
-                <p className="text-[10px] font-mono text-slate-500 mb-1">caminho mínimo:</p>
-                <div className="flex flex-wrap items-center gap-1">
-                  {nomesCaminho.map((nome, i) => (
-                    <span key={i} className="inline-flex items-center gap-1">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-900/40 border border-emerald-500/30 text-emerald-300">
-                        {nome}
-                      </span>
-                      {i < nomesCaminho.length - 1 && (
-                        <span className="text-slate-600 text-[10px]">→</span>
-                      )}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 pt-1">
-              <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400">
-                <span className="inline-block w-2 h-2 rounded-full border border-amber-400 border-dashed" />
-                origem/destino
-              </span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="flex items-center gap-1 text-[10px] font-mono text-indigo-400">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-indigo-900 border border-indigo-400" />
-                fronteira
-              </span>
-              <span className="flex items-center gap-1 text-[10px] font-mono text-blue-400">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-900/40 border border-blue-400" />
-                visitado
-              </span>
-              <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-900/40 border border-emerald-400" />
-                caminho
+        {isFinal && nomesCaminho.length > 0 && (
+          <div className="rounded-lg border border-emerald-500/30 bg-emerald-900/20 px-3 py-2">
+            <p className="text-[10px] font-mono text-emerald-400/70 mb-1.5">caminho mínimo encontrado:</p>
+            <div className="flex flex-wrap items-center gap-1">
+              {nomesCaminho.map((nome, i) => (
+                <span key={i} className="inline-flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded text-xs font-mono bg-emerald-900/50 border border-emerald-500/40 text-emerald-300 font-semibold">
+                    {nome}
+                  </span>
+                  {i < nomesCaminho.length - 1 && (
+                    <span className="text-emerald-600 text-sm">→</span>
+                  )}
+                </span>
+              ))}
+              <span className="ml-2 text-xs font-mono text-emerald-500">
+                ({graus} {graus === 1 ? "salto" : "saltos"})
               </span>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="flex items-center justify-center gap-3 mt-3">
-          <button
-            type="button"
-            disabled={!podeVoltar}
-            onClick={() => setPasso((p) => Math.max(0, p - 1))}
-            className="px-3 py-1.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono disabled:opacity-30 hover:border-slate-500 transition-colors"
-          >
-            ← anterior
-          </button>
-          <span className="text-xs font-mono text-slate-500">
-            {Array.from({ length: passos.length }, (_, i) => (
-              <span
-                key={i}
-                onClick={() => setPasso(i)}
-                className={`inline-block w-2 h-2 rounded-full mx-0.5 cursor-pointer transition-colors ${
-                  i === passo ? "bg-indigo-400" : "bg-slate-700 hover:bg-slate-500"
-                }`}
-              />
-            ))}
-          </span>
-          <button
-            type="button"
-            disabled={!podeAvancar}
-            onClick={() => setPasso((p) => Math.min(passos.length - 1, p + 1))}
-            className="px-3 py-1.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono disabled:opacity-30 hover:border-slate-500 transition-colors"
-          >
-            próximo →
-          </button>
+        <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-slate-800">
+          <div className="flex flex-wrap gap-3">
+            <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400">
+              <span className="inline-block w-2.5 h-2.5 rounded-full border border-amber-400 border-dashed" />
+              origem / destino
+            </span>
+            <span className="flex items-center gap-1 text-[10px] font-mono text-indigo-400">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-indigo-900 border border-indigo-400" />
+              fronteira
+            </span>
+            <span className="flex items-center gap-1 text-[10px] font-mono text-blue-400">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-900/40 border border-blue-400" />
+              visitado
+            </span>
+            <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-900/40 border border-emerald-400" />
+              caminho mínimo
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={!podeVoltar}
+              onClick={() => setPasso((p) => Math.max(0, p - 1))}
+              className="px-3 py-1.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono disabled:opacity-30 hover:border-slate-500 transition-colors"
+            >
+              ← anterior
+            </button>
+            <span className="flex gap-1">
+              {Array.from({ length: passos.length }, (_, i) => (
+                <span
+                  key={i}
+                  onClick={() => setPasso(i)}
+                  className={`inline-block w-2 h-2 rounded-full cursor-pointer transition-colors ${
+                    i === passo ? "bg-indigo-400" : "bg-slate-700 hover:bg-slate-500"
+                  }`}
+                />
+              ))}
+            </span>
+            <button
+              type="button"
+              disabled={!podeAvancar}
+              onClick={() => setPasso((p) => Math.min(passos.length - 1, p + 1))}
+              className="px-3 py-1.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono disabled:opacity-30 hover:border-slate-500 transition-colors"
+            >
+              próximo →
+            </button>
+          </div>
         </div>
       </div>
     </div>
