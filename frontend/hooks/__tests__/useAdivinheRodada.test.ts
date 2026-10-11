@@ -2,23 +2,17 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAdivinheRodada } from "@/hooks/useAdivinheRodada";
-import type { PerguntaRevelada, VereditoParcial } from "@/lib/api";
 
-const perguntaEstrutura: PerguntaRevelada = {
-  camada: "estrutura",
-  enunciado: "Qual estrutura?",
-  alternativas: ["A", "B", "C", "D"],
-};
-const perguntaOperacao: PerguntaRevelada = {
-  camada: "operacao",
-  enunciado: "Qual operação?",
-  alternativas: ["op1", "op2", "op3", "op4"],
-};
-const perguntaComplexidade: PerguntaRevelada = {
-  camada: "complexidade",
-  enunciado: "Qual complexidade?",
-  alternativas: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
-};
+function perguntaCompleta(camada: string, indice_correto: number) {
+  return {
+    camada,
+    enunciado: `Pergunta de ${camada}`,
+    alternativas: ["A", "B", "C", "D"],
+    indice_correto,
+    explicacao_acerto: "correto",
+    explicacao_erro: "errado",
+  };
+}
 
 function respostaRodada() {
   return {
@@ -27,21 +21,17 @@ function respostaRodada() {
       { indice: 0, descricao: "p0", destaques: [], estado: {} },
       { indice: 1, descricao: "p1", destaques: [], estado: {} },
     ],
-    pergunta_estrutura: perguntaEstrutura,
-  };
-}
-
-function veredito(
-  camada: VereditoParcial["camada"],
-  acertou: boolean,
-  proxima: PerguntaRevelada | null
-): VereditoParcial {
-  return {
-    camada,
-    acertou,
-    correto: "A",
-    explicacao: "exp",
-    proxima_pergunta: proxima,
+    pergunta_estrutura: {
+      camada: "estrutura",
+      enunciado: "Qual estrutura?",
+      alternativas: ["A", "B", "C", "D"],
+    },
+    estrutura: "pilha",
+    perguntas: [
+      perguntaCompleta("estrutura", 0),
+      perguntaCompleta("operacao", 1),
+      perguntaCompleta("complexidade", 2),
+    ],
   };
 }
 
@@ -66,60 +56,71 @@ describe("useAdivinheRodada", () => {
     vi.unstubAllGlobals();
   });
 
-  it("carrega rodada e popula pergunta de estrutura", async () => {
+  it("carrega rodada e estado fica respondendo", async () => {
     mockarRespostas([respostaRodada()]);
     const { result } = renderHook(() => useAdivinheRodada(1));
 
     await waitFor(() => {
       expect(result.current.estado).toBe("respondendo");
     });
-    expect(result.current.perguntaAtual?.camada).toBe("estrutura");
-    expect(result.current.vereditosParciais).toEqual([]);
+    expect(result.current.rodada).not.toBeNull();
+    expect(result.current.respostas[0].selecionada).toBeNull();
+    expect(result.current.pontuacao).toBeNull();
   });
 
-  it("enviar palpite avança para próxima pergunta", async () => {
-    mockarRespostas([
-      respostaRodada(),
-      veredito("estrutura", true, perguntaOperacao),
-    ]);
-    const { result } = renderHook(() => useAdivinheRodada(1));
-
-    await waitFor(() => {
-      expect(result.current.estado).toBe("respondendo");
-    });
-
-    await act(async () => {
-      await result.current.enviarPalpite("A");
-    });
-
-    expect(result.current.perguntaAtual?.camada).toBe("operacao");
-    expect(result.current.vereditosParciais).toHaveLength(1);
-    expect(result.current.estado).toBe("respondendo");
-  });
-
-  it("após 3 palpites transiciona para veredito com pontuação correta", async () => {
-    mockarRespostas([
-      respostaRodada(),
-      veredito("estrutura", true, perguntaOperacao),
-      veredito("operacao", false, perguntaComplexidade),
-      veredito("complexidade", true, null),
-    ]);
+  it("selecionar atualiza respostas sem verificar", async () => {
+    mockarRespostas([respostaRodada()]);
     const { result } = renderHook(() => useAdivinheRodada(1));
 
     await waitFor(() => expect(result.current.estado).toBe("respondendo"));
-    await act(async () => {
-      await result.current.enviarPalpite("A");
-    });
-    await act(async () => {
-      await result.current.enviarPalpite("op2");
-    });
-    await act(async () => {
-      await result.current.enviarPalpite("O(1)");
+
+    act(() => {
+      result.current.selecionar(0, 2);
+      result.current.selecionar(1, 0);
     });
 
-    expect(result.current.estado).toBe("veredito");
+    expect(result.current.respostas[0].selecionada).toBe(2);
+    expect(result.current.respostas[1].selecionada).toBe(0);
+    expect(result.current.respostas[0].acertou).toBeNull();
+    expect(result.current.estado).toBe("respondendo");
+  });
+
+  it("verificar computa acertos e muda para estado verificado", async () => {
+    mockarRespostas([respostaRodada()]);
+    const { result } = renderHook(() => useAdivinheRodada(1));
+
+    await waitFor(() => expect(result.current.estado).toBe("respondendo"));
+
+    act(() => {
+      result.current.selecionar(0, 0); // correto (indice_correto=0)
+      result.current.selecionar(1, 3); // errado (indice_correto=1)
+      result.current.selecionar(2, 2); // correto (indice_correto=2)
+    });
+
+    act(() => {
+      result.current.verificar();
+    });
+
+    expect(result.current.estado).toBe("verificado");
     expect(result.current.pontuacao).toBe(2);
-    expect(result.current.vereditosParciais).toHaveLength(3);
+    expect(result.current.respostas[0].acertou).toBe(true);
+    expect(result.current.respostas[1].acertou).toBe(false);
+    expect(result.current.respostas[2].acertou).toBe(true);
+  });
+
+  it("verificar com resposta nula conta como errado", async () => {
+    mockarRespostas([respostaRodada()]);
+    const { result } = renderHook(() => useAdivinheRodada(1));
+
+    await waitFor(() => expect(result.current.estado).toBe("respondendo"));
+
+    act(() => {
+      result.current.verificar();
+    });
+
+    expect(result.current.estado).toBe("verificado");
+    expect(result.current.pontuacao).toBe(0);
+    expect(result.current.respostas[0].acertou).toBe(false);
   });
 
   it("erro no fetch inicial transiciona para estado erro", async () => {
@@ -142,12 +143,16 @@ describe("useAdivinheRodada", () => {
 
     await waitFor(() => expect(result.current.estado).toBe("respondendo"));
 
+    act(() => {
+      result.current.selecionar(0, 1);
+    });
+
     await act(async () => {
       await result.current.proximaRodada();
     });
 
     expect(result.current.estado).toBe("respondendo");
-    expect(result.current.vereditosParciais).toEqual([]);
+    expect(result.current.respostas[0].selecionada).toBeNull();
     expect(result.current.pontuacao).toBeNull();
   });
 });

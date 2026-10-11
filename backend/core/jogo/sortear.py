@@ -22,6 +22,8 @@ class Rodada:
     token: str
     passos: list[Passo]
     pergunta_estrutura: Pergunta
+    estrutura: str
+    perguntas: list[Pergunta]
 
 
 class RodadaInterna(NamedTuple):
@@ -85,4 +87,10 @@ def sortear(seed: int | None, secret: bytes, agora: int) -> Rodada:
         token=tok,
         passos=interna.passos,
         pergunta_estrutura=interna.pergunta_estrutura,
+        estrutura=interna.estrutura,
+        perguntas=[
+            interna.pergunta_estrutura,
+            interna.pergunta_operacao,
+            interna.pergunta_complexidade,
+        ],
     )

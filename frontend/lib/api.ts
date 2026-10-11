@@ -218,10 +218,21 @@ export type PerguntaRevelada = {
   alternativas: [string, string, string, string];
 };
 
+export type PerguntaComResposta = {
+  camada: Camada;
+  enunciado: string;
+  alternativas: [string, string, string, string];
+  indice_correto: number;
+  explicacao_acerto: string;
+  explicacao_erro: string;
+};
+
 export type RodadaResult = {
   token: string;
   passos: PassoJogo[];
   pergunta_estrutura: PerguntaRevelada;
+  estrutura: Estrutura;
+  perguntas: [PerguntaComResposta, PerguntaComResposta, PerguntaComResposta];
 };
 
 export type VereditoParcial = {

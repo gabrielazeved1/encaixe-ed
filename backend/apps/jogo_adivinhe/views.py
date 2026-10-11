@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.jogo.avaliar import PalpiteInvalido, VereditoParcial, avaliar
+from core.jogo.explicacoes import obter_explicacao
 from core.jogo.perguntas import Pergunta
 from core.jogo.sortear import sortear
 from core.jogo.token import TokenExpirado, TokenInvalido
@@ -23,6 +24,17 @@ def _pergunta_revelada(p: Pergunta) -> dict:
         "camada": p.camada,
         "enunciado": p.enunciado,
         "alternativas": list(p.alternativas),
+    }
+
+
+def _pergunta_completa(p: Pergunta, estrutura: str) -> dict:
+    return {
+        "camada": p.camada,
+        "enunciado": p.enunciado,
+        "alternativas": list(p.alternativas),
+        "indice_correto": p.indice_correto,
+        "explicacao_acerto": obter_explicacao(estrutura, p.camada, True),
+        "explicacao_erro": obter_explicacao(estrutura, p.camada, False),
     }
 
 
@@ -58,6 +70,11 @@ class RodadaView(APIView):
                 "token": rodada.token,
                 "passos": rodada.passos,
                 "pergunta_estrutura": _pergunta_revelada(rodada.pergunta_estrutura),
+                "estrutura": rodada.estrutura,
+                "perguntas": [
+                    _pergunta_completa(p, rodada.estrutura)
+                    for p in rodada.perguntas
+                ],
             }
         )
 

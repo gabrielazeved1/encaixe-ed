@@ -4,45 +4,64 @@
 
 **Created**: 2026-10-10
 
-**Status**: Draft
+**Status**: Done — design redesenhado
 
 **Input**: Upgrade do jogo "Adivinhe a Estrutura" (feature 004) com três perguntas progressivas por rodada (estrutura → operação → complexidade), formato de múltipla escolha estilo prova de ED, narrador em linguagem técnica neutra, layout em duas colunas com atalhos de teclado e veredito final em três cards.
 
+---
+
+## Nota de implementação — design redesenhado na sessão final
+
+O design original previa um fluxo **sequencial** de 3 perguntas: o aluno respondia uma pergunta por vez, cada palpite era enviado ao endpoint `/palpite`, e o backend retornava a próxima pergunta. O frontend operava como máquina de estados `carregando → respondendo(estrutura) → respondendo(operacao) → respondendo(complexidade) → veredito`.
+
+**O que foi efetivamente construído é diferente:**
+
+- As 3 perguntas são exibidas **simultaneamente** na coluna da direita como cards empilhados com badges Fácil/Médio/Difícil.
+- A coluna da esquerda exibe uma **animação SVG** da estrutura sorteada (`AdivinheVisual.tsx` despacha para renderers SVG por estrutura), substituindo a visão de passos em texto das features anteriores.
+- O aluno seleciona uma resposta em cada um dos 3 cards e clica **"Verificar respostas"** — verificação feita **inteiramente no cliente**, sem chamada à API.
+- O endpoint `/rodada` foi estendido para incluir `estrutura` (para despacho do SVG) e `perguntas` (array com os 3 cards completos, incluindo `indice_correto`, `explicacao_acerto` e `explicacao_erro`) — o gabarito vai ao cliente de forma explícita.
+- O endpoint `/palpite` **continua existindo e passou todos os 15 testes de backend**, mas **não é chamado pelo frontend na versão final**.
+- O resultado é exibido inline em cada card (✓ verde / ✗ vermelho) + explicação + pontuação ★★★.
+- Navegação ← → por teclado foi mantida via `useAtalhosRodada` para navegar entre passos/etapas; os atalhos `1-4` para seleção de alternativas foram removidos pelo redesign.
+- Contagem final: **290 testes backend (pytest)**, **50 testes frontend (vitest)**, **0 erros TypeScript**.
+
+---
+
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 — Responder as três perguntas de uma rodada (Priority: P1)
+### User Story 1 — Responder as três perguntas de uma rodada (Priority: P1) ✓ Feita
 
-Aluno abre `/adivinhe`, observa os passos de uma operação sem rótulo, e responde três perguntas em sequência: qual é a estrutura, qual é a operação técnica específica, e qual é a complexidade de pior caso. Ao final das três respostas, vê um veredito consolidado com acertos, respostas corretas, explicação acadêmica por camada e pontuação total.
+Aluno abre `/adivinhe`, vê à esquerda uma animação SVG da estrutura (sem rótulo) e à direita 3 cards de perguntas simultâneos (estrutura/operação/complexidade) com badges Fácil/Médio/Difícil. Seleciona uma resposta em cada card e clica "Verificar respostas"; o resultado aparece inline em cada card (✓/✗ + explicação) e a pontuação é exibida como ★★★. Tudo verificado no cliente — sem chamadas à API durante a resposta.
 
 **Why this priority**: é o coração da feature. Sem o fluxo multi-camada funcionando end-to-end, nada do resto importa. É o MVP acadêmico.
 
-**Independent Test**: subir backend + frontend, acessar `/adivinhe`, jogar uma rodada completa, verificar que (a) 3 perguntas aparecem em sequência, (b) o backend valida cada palpite individualmente, (c) o veredito final mostra 3 cards com os 3 gabaritos + explicações corretas conforme a estrutura sorteada, (d) a pontuação é 0, 1, 2 ou 3 e corresponde ao número de acertos.
+**Independent Test**: subir backend + frontend, acessar `/adivinhe`, jogar uma rodada completa, verificar que (a) 3 cards de perguntas aparecem simultaneamente, (b) o botão "Verificar respostas" ativa apenas quando as 3 perguntas foram respondidas, (c) a verificação é client-side usando `indice_correto` do payload de `/rodada`, (d) cada card mostra ✓/✗ + explicação correta conforme a estrutura sorteada, (e) a pontuação é 0–3 estrelas e corresponde ao número de acertos.
 
 **Acceptance Scenarios**:
 
-1. **Given** o aluno acabou de abrir `/adivinhe` com uma rodada carregada, **When** ele escolhe uma alternativa na pergunta de estrutura e confirma, **Then** o backend retorna veredito parcial (acertou/correto) + a próxima pergunta (operação) com enunciado e 4 alternativas.
-2. **Given** o aluno respondeu estrutura e operação, **When** confirma a resposta de complexidade, **Then** o backend retorna o veredito final com 3 cards (um por camada), cada um com ✓ ou ✕, resposta correta, explicação acadêmica de 2–3 linhas, e pontuação total destacada.
-3. **Given** o aluno errou todas as três perguntas, **When** o veredito aparece, **Then** cada card mostra ✕ em âmbar, a resposta correta em destaque, e a explicação cita a invariante formal e por que o distrator escolhido estava errado.
+1. **Given** o aluno acabou de abrir `/adivinhe` com uma rodada carregada, **When** a página renderiza, **Then** a coluna esquerda exibe a animação SVG da estrutura e a coluna direita exibe os 3 cards de perguntas simultaneamente com badges Fácil/Médio/Difícil.
+2. **Given** o aluno selecionou respostas nos 3 cards e clicou "Verificar respostas", **Then** cada card exibe inline ✓ verde ou ✗ vermelho, a resposta correta destacada, a explicação acadêmica correspondente (`explicacao_acerto` ou `explicacao_erro`), e a pontuação ★★★ aparece no topo.
+3. **Given** o aluno errou todas as três perguntas, **When** o resultado inline aparece, **Then** cada card mostra ✗, a resposta correta em destaque, e a explicação cita a invariante formal e por que o distrator escolhido estava errado.
 
 ---
 
-### User Story 2 — Interface acadêmica em duas colunas com atalhos de teclado (Priority: P2)
+### User Story 2 — Interface acadêmica em duas colunas com atalhos de teclado (Priority: P2) ✓ Feita (parcialmente — ver nota)
 
-Aluno responde as perguntas usando apenas o teclado (atalhos 1–4 selecionam alternativa, Enter confirma, ←→ navegam entre passos, espaço avança o próximo passo). A tela mostra os passos à esquerda e a pergunta corrente à direita, com indicador de progresso "Pergunta X de 3". Transições entre perguntas são suaves (fade).
+Aluno navega pelos passos da animação usando ← → no teclado. A tela tem layout em 2 colunas: SVG visual à esquerda, 3 cards de perguntas à direita. Atalhos `1-4` para seleção de alternativas foram **removidos pelo redesign** (os cards simultâneos tornam esse atalho ambíguo — qual card seria alvo?). Atalhos ← → para navegação de passos/etapas foram mantidos via `useAtalhosRodada`.
 
-**Why this priority**: a feature se destina a estudo e repetição; teclado reduz fricção pra quem joga muitas rodadas seguidas. Layout em duas colunas evita rolagem e mantém passos+pergunta visíveis simultaneamente.
+**Why this priority**: teclado reduz fricção para quem joga muitas rodadas. Layout 2 colunas evita rolagem.
 
-**Independent Test**: com US1 pronta, verificar manualmente que (a) teclas 1,2,3,4 selecionam alternativas A,B,C,D, (b) Enter confirma e avança, (c) ←/→ navegam entre passos, (d) espaço avança o passo (equivalente a →), (e) layout em 2 colunas em telas ≥1024px, (f) progress indicator mostra "Pergunta X de 3" com dots coloridos.
+**Independent Test**: verificar manualmente que (a) ←/→ navegam entre passos da animação SVG, (b) layout em 2 colunas em telas ≥1024px está presente, (c) atalhos `1-4` não existem mais (não há alternativas individuais selecionáveis por teclado neste design).
 
 **Acceptance Scenarios**:
 
-1. **Given** a pergunta de estrutura está sendo exibida, **When** o aluno pressiona `2`, **Then** a alternativa B fica selecionada visualmente (não confirmada ainda).
-2. **Given** a alternativa B está selecionada, **When** o aluno pressiona `Enter`, **Then** o palpite é enviado e a próxima pergunta aparece com transição suave.
-3. **Given** há 5 passos exibidos e o aluno está no passo 2, **When** pressiona `→` ou `espaço`, **Then** o passo 3 é exibido.
+1. **Given** a rodada está carregada e os 3 cards estão visíveis, **When** o aluno pressiona `→`, **Then** o próximo passo da animação SVG é exibido.
+2. **Given** o aluno está no passo 3 da animação, **When** pressiona `←`, **Then** retorna ao passo 2.
+3. **Given** os 3 cards de perguntas visíveis, **When** o aluno seleciona respostas via mouse/toque e clica "Verificar respostas", **Then** o resultado inline aparece em cada card. _(Atalhos 1-4 não estão presentes neste design — removidos para evitar ambiguidade com 3 cards simultâneos.)_
 
 ---
 
-### User Story 3 — Banco de enunciados acadêmicos variados (Priority: P2)
+### User Story 3 — Banco de enunciados acadêmicos variados (Priority: P2) ✓ Feita
 
 Cada combinação `(estrutura, camada)` tem ao menos 2 enunciados alternativos no banco; a cada rodada o backend sorteia (determinístico por seed) qual enunciado usar. Isso evita que o aluno decore a resposta pelo texto da pergunta e força a entender a mecânica.
 
@@ -58,7 +77,7 @@ Cada combinação `(estrutura, camada)` tem ao menos 2 enunciados alternativos n
 
 ---
 
-### User Story 4 — Veredito final com explicações acadêmicas elaboradas (Priority: P3)
+### User Story 4 — Veredito final com explicações acadêmicas elaboradas (Priority: P3) ✓ Feita (inline nos cards, não tela separada)
 
 Após responder as 3 perguntas, o aluno vê um painel com 3 cards (estrutura/operação/complexidade), cada um com ícone ✓/✕, resposta correta destacada, e explicação acadêmica de 2–3 linhas citando a invariante formal, o nome real da estrutura (sem mais vazamento, o jogo já acabou), e por que os distratores comuns estão errados. Pontuação 0–3 estrelas aparece centralizada no topo.
 
@@ -92,7 +111,7 @@ Após responder as 3 perguntas, o aluno vê um painel com 3 cards (estrutura/ope
 
 - **FR-001**: Sistema MUST entregar 3 perguntas por rodada, em ordem fixa: (1) identificação da estrutura, (2) identificação da operação técnica específica, (3) identificação da complexidade de pior caso.
 - **FR-002**: Cada pergunta MUST ter exatamente 4 alternativas, identificadas como A, B, C, D, com exatamente 1 alternativa correta.
-- **FR-003**: Após o aluno responder uma pergunta, o sistema MUST entregar imediatamente a próxima pergunta (sem recarregar a página) ou, se foi a última, MUST entregar o veredito final completo.
+- **FR-003**: ~~Após o aluno responder uma pergunta, o sistema MUST entregar imediatamente a próxima pergunta.~~ **[Redesenhado]** As 3 perguntas são exibidas simultaneamente na coluna direita. O aluno seleciona respostas nos 3 cards e clica "Verificar respostas"; a verificação ocorre inteiramente no cliente usando `indice_correto` incluído no payload de `/rodada`.
 - **FR-004**: Veredito parcial de cada pergunta MUST incluir: se o palpite estava correto, a alternativa correta, e (no último estágio) a pontuação total 0–3.
 - **FR-005**: Veredito final MUST incluir 3 explicações acadêmicas (uma por camada), cada uma com 2–3 linhas de texto citando o nome real da estrutura, invariante formal, e justificativa dos distratores quando relevante.
 
@@ -106,7 +125,7 @@ Após responder as 3 perguntas, o aluno vê um painel com 3 cards (estrutura/ope
 
 #### Interface
 
-- **FR-011**: Em telas ≥1024px de largura, interface MUST exibir passos à esquerda e pergunta corrente à direita em grid de 2 colunas. Em telas menores, colapsa para 1 coluna com passos acima.
+- **FR-011**: Em telas ≥1024px de largura, interface MUST exibir **animação SVG da estrutura** à esquerda e **3 cards de perguntas simultâneos** à direita em grid de 2 colunas. Em telas menores, colapsa para 1 coluna. O SVG é despachado pelo componente `AdivinheVisual.tsx` conforme o campo `estrutura` da resposta de `/rodada`.
 - **FR-012**: Indicador de progresso MUST exibir "Pergunta X de 3" com representação visual (ex.: 3 dots, o atual destacado) acima da pergunta.
 - **FR-013**: Teclado MUST aceitar: `1`, `2`, `3`, `4` para selecionar alternativas A–D; `Enter` para confirmar; `←`/`→` para navegar entre passos; `espaço` como alias de `→`.
 - **FR-014**: Alternativa selecionada MUST ter indicação visual distinta antes de confirmar (ex.: borda destacada), para evitar confirmação acidental.
@@ -123,13 +142,13 @@ Após responder as 3 perguntas, o aluno vê um painel com 3 cards (estrutura/ope
 
 - **FR-020**: Endpoint de rodada MUST retornar, numa única resposta, o conjunto {token, passos, primeira pergunta pronta (enunciado + 4 alternativas)}.
 - **FR-021**: Endpoint de palpite MUST aceitar `{token, estagio, palpite}` onde `estagio ∈ {"estrutura", "operacao", "complexidade"}` e `palpite` é uma string correspondente a uma das 4 alternativas da pergunta.
-- **FR-022**: Endpoint de palpite MUST retornar `{acertou, correto}` sempre, e adicionalmente `proxima_pergunta` quando `estagio ∈ {"estrutura", "operacao"}` ou `veredito_final` quando `estagio == "complexidade"`.
-- **FR-023**: Backend MUST ser stateless entre chamadas de palpite — toda informação necessária (estrutura correta, operação correta, seed) MUST estar no token assinado por HMAC. Backend NÃO MANTÉM estado da pontuação parcial entre as 3 chamadas: o frontend acumula os `acertou` locais e o backend recalcula a pontuação final no último palpite baseado nos 3 palpites enviados em sequência pelo mesmo token.
+- **FR-022**: Endpoint de palpite MUST retornar `{acertou, correto}` sempre, e adicionalmente `proxima_pergunta` quando `estagio ∈ {"estrutura", "operacao"}` ou `veredito_final` quando `estagio == "complexidade"`. **[Nota de implementação]** O frontend **não chama `/palpite`** na versão final — verificação é client-side. O endpoint continua ativo, passa todos os 15 testes de backend, e está mantido para compatibilidade futura.
+- **FR-023**: ~~Backend MUST ser stateless: frontend acumula acertou e backend recalcula pontuação final no último palpite.~~ **[Redesenhado]** O backend continua stateless. Na versão final, o frontend verifica respostas diretamente contra `indice_correto` nos campos `perguntas` da resposta de `/rodada`, sem enviar palpites ao backend. A pontuação é calculada inteiramente no cliente.
 
 ### Key Entities
 
-- **Rodada**: unidade mínima do jogo. Contém `{token, passos, pergunta_inicial}` ao ser criada. Token codifica estrutura e operação sorteadas.
-- **Pergunta**: `{camada: "estrutura"|"operacao"|"complexidade", enunciado: str, alternativas: [str × 4], indice_correto: int}` — gerada no backend, enviada ao frontend sem o `indice_correto` (a identificação do correto fica no backend).
+- **Rodada**: unidade mínima do jogo. Contém `{token, passos, estrutura, perguntas}` ao ser criada — `estrutura` é o nome da estrutura sorteada (para despacho do SVG), `perguntas` é array com as 3 perguntas completas incluindo gabarito.
+- **Pergunta**: `{camada: "estrutura"|"operacao"|"complexidade", enunciado: str, alternativas: [str × 4], indice_correto: int, explicacao_acerto: str, explicacao_erro: str}` — gerada no backend, enviada ao frontend **com** `indice_correto` e explicações (verificação client-side exige o gabarito no cliente).
 - **Palpite**: `{token, estagio, palpite: str}` — o `palpite` é o conteúdo da alternativa escolhida (não o índice), para desacoplar o frontend da ordem.
 - **VereditoParcial**: `{acertou: bool, correto: str}` + opcional `proxima_pergunta: Pergunta`.
 - **VereditoFinal**: `{pontuacao: 0..3, acertos: {estrutura, operacao, complexidade}, corretos: {estrutura, operacao, complexidade}, explicacoes: {estrutura: str, operacao: str, complexidade: str}}`.
@@ -146,7 +165,7 @@ Após responder as 3 perguntas, o aluno vê um painel com 3 cards (estrutura/ope
 - **SC-004**: Alunos conseguem jogar uma rodada completa sem usar mouse (teclado 1–4 + Enter + setas suficientes para responder as 3 perguntas e navegar passos).
 - **SC-005**: Rodada completa (abrir + ler + responder 3 + ver veredito) leva ao jogador em média 60–120s em teste manual — tempo compatível com uso em sessão de estudo.
 - **SC-006**: Sessão de 10 rodadas consecutivas (via botão "Próxima") funciona sem necessidade de recarregar a página.
-- **SC-007**: Zero regressão: todas as suítes de teste backend (atualmente 256 testes pytest) e frontend (atualmente 26 testes vitest) continuam verdes após a feature.
+- **SC-007**: Zero regressão: todas as suítes de teste backend (**290 testes pytest**) e frontend (**50 testes vitest**) continuam verdes após a feature. 0 erros TypeScript.
 
 ## Assumptions
 

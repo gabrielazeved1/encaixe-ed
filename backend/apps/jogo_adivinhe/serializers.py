@@ -36,6 +36,17 @@ class PalpiteRequestSerializer(serializers.Serializer):
     palpite = serializers.CharField()
 
 
+class PerguntaComRespostaSerializer(serializers.Serializer):
+    camada = serializers.ChoiceField(choices=CAMADAS_CHOICES)
+    enunciado = serializers.CharField()
+    alternativas = serializers.ListField(
+        child=serializers.CharField(), min_length=4, max_length=4
+    )
+    indice_correto = serializers.IntegerField(min_value=0, max_value=3)
+    explicacao_acerto = serializers.CharField()
+    explicacao_erro = serializers.CharField()
+
+
 class VereditoParcialSerializer(serializers.Serializer):
     camada = serializers.ChoiceField(choices=CAMADAS_CHOICES)
     acertou = serializers.BooleanField()

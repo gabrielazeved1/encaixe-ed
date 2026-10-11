@@ -2,6 +2,8 @@
 
 Valida um palpite em uma das 3 camadas (estrutura, operação, complexidade) e devolve veredito parcial + próxima pergunta ou sinal de fim.
 
+> **Status frontend:** Endpoint ativo e testado no backend (15 testes passando), mas **não utilizado pelo frontend na versão final**. O frontend verifica client-side via os campos `indice_correto`/`explicacao_acerto`/`explicacao_erro` da resposta de `/rodada`. Mantido para compatibilidade e eventual uso futuro.
+
 **Breaking change em relação à feature 004:** body ganha `estagio`; resposta muda formato.
 
 ---

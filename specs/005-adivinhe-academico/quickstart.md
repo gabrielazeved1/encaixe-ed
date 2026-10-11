@@ -10,14 +10,14 @@ Guia de validação end-to-end da feature 005. Rode cada cenário em sequência;
 # Backend
 cd backend
 source .venv/bin/activate
-pytest -q                              # deve mostrar >= 256 testes verdes (base atual + novos)
+pytest -q                              # deve mostrar >= 290 testes verdes
 python manage.py runserver             # terminal A
 
 # Frontend (terminal B)
 cd frontend
 npm install
-npm run build                          # tipagem + lint
-npm test -- --run                      # vitest em single-run
+npm run build                          # tipagem + lint (0 erros TypeScript)
+npm test -- --run                      # vitest em single-run (>= 50 testes)
 npm run dev                            # http://localhost:3000
 ```
 
@@ -32,11 +32,12 @@ Ao final de ambos os servidores subindo:
 **Objetivo:** garantir que o setup está consistente.
 
 **Passos:**
-1. Rode `pytest -q` em `backend/` — todos verdes (255+).
-2. Rode `npm test -- --run` em `frontend/` — todos verdes.
-3. Rode `curl http://localhost:8000/api/jogo_adivinhe/rodada?seed=0 | jq .` — deve retornar `{token, passos, pergunta_estrutura}`.
+1. Rode `pytest -q` em `backend/` — todos verdes (290 testes).
+2. Rode `npm test -- --run` em `frontend/` — todos verdes (50 testes).
+3. Rode `npm run build` em `frontend/` — sem erros TypeScript.
+4. Rode `curl http://localhost:8000/api/jogo_adivinhe/rodada?seed=0 | jq .` — deve retornar `{token, estrutura, passos, perguntas, pergunta_estrutura}`.
 
-**Esperado:** `pergunta_estrutura.camada == "estrutura"`, `len(pergunta_estrutura.alternativas) == 4`.
+**Esperado:** `perguntas` é array com 3 elementos; cada elemento tem `camada`, `enunciado`, `alternativas` (4 itens), `indice_correto`, `explicacao_acerto`, `explicacao_erro`.
 
 - [ ] Validado
 
@@ -44,21 +45,20 @@ Ao final de ambos os servidores subindo:
 
 ## Cenário 2 — Fluxo completo end-to-end (US1 — P1)
 
-**Objetivo:** responder 1 rodada completa pela UI e ver 3 cards no veredito.
+**Objetivo:** jogar 1 rodada completa pela UI e ver o resultado inline nos 3 cards.
 
 **Passos:**
 1. Acesse `http://localhost:3000/adivinhe`.
-2. Observe que a tela tem 2 colunas: passos à esquerda, pergunta à direita.
-3. Observe que o indicador no topo mostra "Pergunta 1 de 3" com 3 dots (o 1º destacado).
-4. Navegue pelos passos com `→` ou botão "Próximo passo".
-5. Clique na alternativa A, B, C ou D (ou pressione `1`-`4` no teclado).
-6. Confirme (botão "Confirmar" ou tecla `Enter`).
-7. Observe transição suave para a pergunta 2 (operação). Progresso: "Pergunta 2 de 3".
-8. Repita para a pergunta 2 e 3.
-9. Observe a tela de veredito final: 3 cards horizontais (estrutura/operação/complexidade), cada um com ✓/✕ + resposta correta + explicação. Pontuação 0–3 estrelas no topo.
-10. Clique em "Próxima rodada" — nova rodada carrega sem recarregar a página.
+2. Observe o layout em 2 colunas: à esquerda, animação SVG da estrutura sorteada; à direita, 3 cards de perguntas com badges **Fácil** / **Médio** / **Difícil**.
+3. Navegue pelos passos da animação com `←` / `→` (ou botões) para observar a estrutura sem nome revelado.
+4. Selecione uma alternativa no card 1 (estrutura), uma no card 2 (operação) e uma no card 3 (complexidade).
+5. Observe que o botão **"Verificar respostas"** só fica ativo quando as 3 perguntas estão respondidas.
+6. Clique em **"Verificar respostas"**.
+7. Observe o resultado inline em cada card: ✓ verde (acerto) ou ✗ vermelho (erro) + resposta correta destacada + explicação acadêmica.
+8. Observe a pontuação ★★★ exibida (0–3 estrelas).
+9. Clique em **"Nova rodada →"** — nova rodada carrega sem recarregar a página.
 
-**Esperado:** fluxo roda sem erro; cada pergunta tem exatamente 4 alternativas; cada card do veredito tem explicação de 2–3 linhas.
+**Esperado:** fluxo roda sem erro; verificação é instantânea (sem chamada de rede); cada card mostra explicação de 2–3 linhas.
 
 - [ ] Validado
 
@@ -69,30 +69,35 @@ Ao final de ambos os servidores subindo:
 **Objetivo:** verificar que não há vazamento de nome.
 
 **Passos:**
-1. Em DevTools (F12 → Network), capture a response de `GET /rodada` e `POST /palpite` (estágio estrutura).
-2. Rode no console do browser: `const txt = JSON.stringify(responseRodada.passos) + responseRodada.pergunta_estrutura.enunciado; ["pilha","fila","heap","hash","bst","linkedlist","grafo","stack","queue","dijkstra","bfs","monte","árvore binária","lista encadeada"].forEach(w => { if (txt.toLowerCase().includes(w)) console.error("VAZOU:", w) });`
+1. Em DevTools (F12 → Network), capture a response de `GET /rodada`.
+2. Rode no console do browser:
+   ```js
+   const r = /* response de /rodada */;
+   const txt = JSON.stringify(r.passos) + r.perguntas[0].enunciado;
+   ["pilha","fila","heap","hash","bst","linkedlist","grafo","stack","queue","dijkstra","bfs","monte","árvore binária","lista encadeada"].forEach(w => {
+     if (txt.toLowerCase().includes(w)) console.error("VAZOU:", w);
+   });
+   ```
 3. Esperado: nenhum output no console.
 
-**Esperado:** zero vazamentos.
+**Esperado:** zero vazamentos nos passos e no enunciado da pergunta de estrutura.
 
 - [ ] Validado
 
 ---
 
-## Cenário 4 — Teclado (US2)
+## Cenário 4 — Teclado (US2) — ← → apenas; 1-4 removidos por design
 
-**Objetivo:** completar uma rodada sem usar o mouse.
+**Objetivo:** navegar passos com teclado; confirmar ausência dos atalhos 1-4.
 
 **Passos:**
 1. Abra `http://localhost:3000/adivinhe`.
-2. Use só o teclado:
-   - `→` / `espaço`: avança passo.
-   - `←`: volta passo.
-   - `1` / `2` / `3` / `4`: seleciona alternativa A/B/C/D.
-   - `Enter`: confirma.
-3. Complete a rodada inteira sem clicar.
+2. Use `→` e `←` para navegar entre os passos da animação SVG — deve funcionar.
+3. Tente pressionar `1`, `2`, `3`, `4` — **não deve selecionar alternativas** (atalhos removidos pelo redesign; os 3 cards simultâneos tornam o atalho ambíguo).
+4. Selecione respostas nos 3 cards via mouse/toque.
+5. Clique "Verificar respostas".
 
-**Esperado:** rodada completável só com teclado.
+**Esperado:** ← → navegam passos. Teclas 1-4 não fazem nada (design intencional). A rodada requer mouse/toque para seleção de alternativas.
 
 - [ ] Validado
 
@@ -107,6 +112,7 @@ Ao final de ambos os servidores subindo:
 2. Abra o mesmo link em outra aba.
 3. Compare os passos exibidos: devem ser idênticos.
 4. Compare os 3 enunciados e a ordem das alternativas: idênticos.
+5. Confirme que `indice_correto` é o mesmo nos dois.
 
 **Esperado:** rodadas idênticas bit-a-bit.
 
@@ -139,12 +145,12 @@ Ao final de ambos os servidores subindo:
 
 ## Cenário 7 — Veredito acadêmico (US4)
 
-**Objetivo:** validar qualidade das explicações.
+**Objetivo:** validar qualidade das explicações inline nos cards.
 
 **Passos:**
 1. Jogue 7 rodadas (uma por estrutura, via seed controlada):
-   - `?seed=10` (heap), `?seed=20` (bst), `?seed=30` (pilha), `?seed=40` (fila), `?seed=50` (hash), `?seed=60` (linkedlist), `?seed=70` (grafo). _Ajuste as seeds após inspecionar quais caem em cada estrutura._
-2. Para cada rodada, no veredito final leia os 3 cards.
+   - `?seed=10`, `?seed=20`, `?seed=30`, `?seed=40`, `?seed=50`, `?seed=60`, `?seed=70`. _Ajuste as seeds após inspecionar quais caem em cada estrutura._
+2. Para cada rodada, após clicar "Verificar respostas", leia as explicações em cada card.
 3. Verifique:
    - Cada explicação tem 2–3 linhas (não 1 palavra).
    - Cita o nome real da estrutura (ex.: "monte binário", "árvore de busca binária").
@@ -157,9 +163,11 @@ Ao final de ambos os servidores subindo:
 
 ---
 
-## Cenário 8 — Token expirado (edge case)
+## Cenário 8 — Token expirado (edge case — testa backend /palpite, não fluxo normal)
 
-**Objetivo:** token com TTL excedido retorna 404.
+**Objetivo:** token com TTL excedido retorna 404 no endpoint `/palpite`.
+
+> **Nota:** este cenário testa o endpoint `/palpite` no backend diretamente via curl. O frontend na versão final não chama `/palpite`, então este edge case não afeta o fluxo normal da UI.
 
 **Passos:**
 1. Reduza `TTL_SEGUNDOS = 2` em `backend/core/jogo/token.py` **temporariamente**.
@@ -176,9 +184,11 @@ Ao final de ambos os servidores subindo:
 
 ---
 
-## Cenário 9 — Palpite inválido
+## Cenário 9 — Palpite inválido (edge case — testa backend /palpite, não fluxo normal)
 
 **Objetivo:** backend rejeita palpite que não bate com nenhuma alternativa.
+
+> **Nota:** este cenário testa o endpoint `/palpite` no backend diretamente via curl. O frontend na versão final não chama `/palpite`.
 
 **Passos:**
 ```bash
@@ -199,9 +209,10 @@ curl -X POST http://localhost:8000/api/jogo_adivinhe/palpite \
 **Objetivo:** nenhum teste das features 001–004 quebrou.
 
 **Passos:**
-1. `cd backend && pytest -q` — todos verdes.
-2. `cd frontend && npm test -- --run` — todos verdes.
-3. Testar manualmente 1 projeto antigo (ex.: `/projetos/pilha-call-stack`) — deve funcionar normalmente.
+1. `cd backend && pytest -q` — todos os 290 verdes.
+2. `cd frontend && npm test -- --run` — todos os 50 verdes.
+3. `cd frontend && npm run build` — 0 erros TypeScript.
+4. Testar manualmente 1 projeto antigo (ex.: `/projetos/pilha-call-stack`) — deve funcionar normalmente.
 
 **Esperado:** suíte estável, nenhuma UI de projeto antigo quebrada.
 
@@ -218,6 +229,6 @@ curl -X POST http://localhost:8000/api/jogo_adivinhe/palpite \
 - [ ] 5. Seed reprodutível
 - [ ] 6. Banco variado
 - [ ] 7. Explicações acadêmicas
-- [ ] 8. Token expirado
-- [ ] 9. Palpite inválido
+- [ ] 8. Token expirado (backend /palpite)
+- [ ] 9. Palpite inválido (backend /palpite)
 - [ ] 10. Zero regressão
