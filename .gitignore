@@ -48,6 +48,10 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Spec Kit e Claude Code (tooling local — não vai pro repo)
+# Spec Kit, Claude Code e documentação interna (tooling local — não vai pro repo)
 .specify/
 .claude/
+CLAUDE.md
+spec-site-estruturas-de-dados.md
+specs/
+deploy-checklist.txt
