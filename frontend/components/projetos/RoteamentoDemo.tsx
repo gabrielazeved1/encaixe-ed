@@ -5,30 +5,37 @@ import { useRoteamento } from "@/hooks/useRoteamento";
 import { RoteamentoVisual } from "@/components/projetos/RoteamentoVisual";
 import { ArestaRot } from "@/lib/api";
 
-const NOS_INICIAL = "A,B,C,D,E";
-const ARESTAS_INICIAL = "A-B:2\nB-C:3\nA-C:10\nC-D:1\nB-D:8\nD-E:4";
+const PRESET_NOS = ["SP", "RJ", "BH", "CWB", "POA"];
+const PRESET_ARESTAS: ArestaRot[] = [
+  { origem: "SP", destino: "RJ", custo: 430 },
+  { origem: "SP", destino: "BH", custo: 590 },
+  { origem: "SP", destino: "CWB", custo: 410 },
+  { origem: "RJ", destino: "BH", custo: 440 },
+  { origem: "BH", destino: "CWB", custo: 990 },
+  { origem: "CWB", destino: "POA", custo: 710 },
+];
+
+const ARESTAS_TEXTO_INICIAL = PRESET_ARESTAS.map(
+  (a) => `${a.origem}-${a.destino}:${a.custo}`
+).join("\n");
 
 function parseArestas(texto: string): ArestaRot[] {
-  const linhas = texto.split("\n").map((l) => l.trim()).filter(Boolean);
-  const arestas: ArestaRot[] = [];
-  for (const l of linhas) {
-    const match = l.match(/^([A-Za-z0-9_]+)\s*-\s*([A-Za-z0-9_]+)\s*:\s*(\d+)$/);
-    if (match) {
-      arestas.push({
-        origem: match[1],
-        destino: match[2],
-        custo: parseInt(match[3], 10),
-      });
-    }
-  }
-  return arestas;
+  return texto
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .flatMap((l) => {
+      const m = l.match(/^([A-Za-z0-9_]+)\s*-\s*([A-Za-z0-9_]+)\s*:\s*(\d+)$/);
+      return m ? [{ origem: m[1], destino: m[2], custo: parseInt(m[3], 10) }] : [];
+    });
 }
 
 export function RoteamentoDemo() {
-  const [nosTexto, setNosTexto] = useState<string>(NOS_INICIAL);
-  const [arestasTexto, setArestasTexto] = useState<string>(ARESTAS_INICIAL);
-  const [origem, setOrigem] = useState<string>("A");
-  const [destino, setDestino] = useState<string>("E");
+  const [nosTexto, setNosTexto] = useState(PRESET_NOS.join(","));
+  const [arestasTexto, setArestasTexto] = useState(ARESTAS_TEXTO_INICIAL);
+  const [origem, setOrigem] = useState("SP");
+  const [destino, setDestino] = useState("POA");
+  const [editando, setEditando] = useState(false);
 
   const { resultado, loading, erro, simular } = useRoteamento();
 
@@ -37,46 +44,31 @@ export function RoteamentoDemo() {
     [nosTexto]
   );
 
+  const arestas = useMemo(() => parseArestas(arestasTexto), [arestasTexto]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const arestas = parseArestas(arestasTexto);
     await simular(nos, arestas, origem, destino);
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6">
-      <h2 className="text-base font-semibold text-white mb-5">
-        Demonstração interativa
-      </h2>
+    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6 space-y-5">
+      <div>
+        <h2 className="text-base font-semibold text-white mb-1">
+          Demonstração interativa
+        </h2>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          O algoritmo de{" "}
+          <span className="text-purple-300 font-medium">Dijkstra</span> encontra o
+          caminho de{" "}
+          <span className="text-white">menor custo total</span> entre dois pontos
+          de uma rede. A cada passo ele escolhe o ponto mais barato ainda não
+          visitado — por isso garante o ótimo global.
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 mb-6">
-        <div>
-          <label className="block text-xs font-mono text-slate-400 mb-1">
-            Nós{" "}
-            <span className="text-slate-600">— roteadores separados por vírgula</span>
-          </label>
-          <input
-            type="text"
-            value={nosTexto}
-            onChange={(e) => setNosTexto(e.target.value)}
-            className="w-full bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono focus:outline-none focus:border-purple-500"
-            placeholder="ex: A,B,C,D"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-mono text-slate-400 mb-1">
-            Links{" "}
-            <span className="text-slate-600">— um por linha no formato</span>{" "}
-            <span className="text-purple-400 font-mono">origem-destino:custo</span>
-          </label>
-          <textarea
-            value={arestasTexto}
-            onChange={(e) => setArestasTexto(e.target.value)}
-            rows={5}
-            className="w-full bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono focus:outline-none focus:border-purple-500"
-          />
-        </div>
-        <div className="flex gap-3 flex-wrap items-end">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-mono text-slate-400 mb-1">
               Origem
@@ -84,12 +76,10 @@ export function RoteamentoDemo() {
             <select
               value={origem}
               onChange={(e) => setOrigem(e.target.value)}
-              className="bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
             >
               {nos.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
+                <option key={n} value={n}>{n}</option>
               ))}
             </select>
           </div>
@@ -100,96 +90,168 @@ export function RoteamentoDemo() {
             <select
               value={destino}
               onChange={(e) => setDestino(e.target.value)}
-              className="bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#0d1117] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
             >
               {nos.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
+                <option key={n} value={n}>{n}</option>
               ))}
             </select>
           </div>
+        </div>
+
+        <div className="flex gap-3 items-center">
           <button
             type="submit"
             disabled={loading}
-            className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-lg px-5 py-2 text-sm font-medium transition-colors"
+            className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-lg px-6 py-2 text-sm font-medium transition-colors"
           >
             {loading ? "Calculando…" : "Calcular rota"}
           </button>
+          <button
+            type="button"
+            onClick={() => setEditando((v) => !v)}
+            className="text-xs font-mono text-slate-500 hover:text-slate-300 transition-colors underline underline-offset-2"
+          >
+            {editando ? "← ocultar grafo" : "Editar grafo →"}
+          </button>
         </div>
+
+        {editando && (
+          <div className="space-y-3 rounded-lg border border-slate-700 bg-[#0d1117] p-4">
+            <div>
+              <label className="block text-xs font-mono text-slate-400 mb-1">
+                Pontos{" "}
+                <span className="text-slate-600">— separados por vírgula</span>
+              </label>
+              <input
+                type="text"
+                value={nosTexto}
+                onChange={(e) => setNosTexto(e.target.value)}
+                className="w-full bg-[#161b27] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono focus:outline-none focus:border-purple-500"
+                placeholder="A,B,C,D"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-mono text-slate-400 mb-1">
+                Conexões{" "}
+                <span className="text-slate-600">— uma por linha:</span>{" "}
+                <span className="text-purple-400 font-mono">A-B:custo</span>
+              </label>
+              <textarea
+                value={arestasTexto}
+                onChange={(e) => setArestasTexto(e.target.value)}
+                rows={4}
+                className="w-full bg-[#161b27] border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono focus:outline-none focus:border-purple-500"
+              />
+            </div>
+          </div>
+        )}
       </form>
 
-      {erro && <p className="text-red-400 text-sm mb-4">{erro}</p>}
+      {erro && <p className="text-red-400 text-sm">{erro}</p>}
 
       {resultado ? (
         <RoteamentoVisual
+          nos={nos}
+          arestas={arestas}
           caminho={resultado.caminho}
           custoTotal={resultado.custo_total}
           passos={resultado.passos}
+          origem={origem}
+          destino={destino}
         />
       ) : (
-        <EmptyStateGrafo cor="purple" />
+        <EmptyStateGrafo nos={nos} arestas={arestas} />
       )}
     </div>
   );
 }
 
-export function EmptyStateGrafo({ cor }: { cor: "purple" | "indigo" }) {
-  const stroke = cor === "purple" ? "rgb(192 132 252)" : "rgb(129 140 248)";
-  const fill = cor === "purple" ? "rgb(59 7 100)" : "rgb(49 46 129)";
-  const text = cor === "purple" ? "rgb(233 213 255)" : "rgb(224 231 255)";
-  const edges: [number, number, number, number][] = [
-    [100, 30, 40, 90], [100, 30, 160, 90],
-    [40, 90, 80, 160], [40, 90, 140, 160],
-    [160, 90, 140, 160],
-  ];
-  const nodes = [
-    { cx: 100, cy: 30, v: "A" },
-    { cx: 40, cy: 90, v: "B" },
-    { cx: 160, cy: 90, v: "C" },
-    { cx: 80, cy: 160, v: "D" },
-    { cx: 140, cy: 160, v: "E" },
-  ];
+export function EmptyStateGrafo({
+  nos,
+  arestas,
+  cor = "purple",
+}: {
+  nos?: string[];
+  arestas?: ArestaRot[];
+  cor?: "purple" | "indigo";
+}) {
+  const displayNos = nos ?? PRESET_NOS;
+  const displayArestas = arestas ?? PRESET_ARESTAS;
+
+  const n = displayNos.length;
+  const cx = 130, cy = 100, r = 80;
+  const posicoes: Record<string, { x: number; y: number }> = {};
+  displayNos.forEach((no, i) => {
+    const ang = (2 * Math.PI * i) / n - Math.PI / 2;
+    posicoes[no] = { x: cx + r * Math.cos(ang), y: cy + r * Math.sin(ang) };
+  });
+
+  const stroke = cor === "purple" ? "#a855f7" : "#818cf8";
+  const fillNode = cor === "purple" ? "#3b0764" : "#312e81";
+  const textCol = cor === "purple" ? "#e9d5ff" : "#e0e7ff";
+
+  const vistas = new Set<string>();
+  const arestasUnicas = displayArestas.filter((a) => {
+    const k = [a.origem, a.destino].sort().join("|");
+    if (vistas.has(k)) return false;
+    vistas.add(k);
+    return true;
+  });
+
   return (
-    <div className="rounded-lg border border-slate-700 bg-[#0d1117] p-6">
-      <svg viewBox="0 0 200 190" className="w-full max-w-xs mx-auto">
-        {edges.map(([x1, y1, x2, y2], i) => (
-          <line
-            key={i}
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
-            stroke={stroke}
-            strokeWidth="1.5"
-            opacity="0.3"
-          />
-        ))}
-        {nodes.map((n) => (
-          <g key={n.v}>
-            <circle
-              cx={n.cx}
-              cy={n.cy}
-              r={16}
-              fill={fill}
-              stroke={stroke}
-              strokeWidth="1.5"
-            />
-            <text
-              x={n.cx}
-              y={n.cy + 4}
-              textAnchor="middle"
-              fill={text}
-              fontSize="11"
-              fontFamily="monospace"
-            >
-              {n.v}
-            </text>
-          </g>
-        ))}
+    <div className="rounded-lg border border-slate-700 bg-[#0d1117] p-4 space-y-2">
+      <p className="text-xs font-mono text-slate-500 text-center">
+        {cor === "purple" ? "grafo ponderado · Dijkstra" : "grafo não ponderado · BFS"}
+      </p>
+      <svg viewBox="0 0 260 200" className="w-full max-w-xs mx-auto">
+        {arestasUnicas.map((a) => {
+          const pa = posicoes[a.origem];
+          const pb = posicoes[a.destino];
+          if (!pa || !pb) return null;
+          const key = [a.origem, a.destino].sort().join("|");
+          const mid = { x: (pa.x + pb.x) / 2, y: (pa.y + pb.y) / 2 };
+          const dx = pb.x - pa.x, dy = pb.y - pa.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+          const ox = (-dy / len) * 8, oy = (dx / len) * 8;
+          return (
+            <g key={key}>
+              <line x1={pa.x} y1={pa.y} x2={pb.x} y2={pb.y}
+                stroke={stroke} strokeWidth="1.5" opacity="0.25"
+              />
+              {cor === "purple" && (
+                <text x={mid.x + ox} y={mid.y + oy}
+                  textAnchor="middle" dominantBaseline="middle"
+                  fontSize={8} fontFamily="ui-monospace, monospace"
+                  fill="#64748b"
+                >
+                  {a.custo}
+                </text>
+              )}
+            </g>
+          );
+        })}
+        {displayNos.map((no) => {
+          const pos = posicoes[no];
+          if (!pos) return null;
+          return (
+            <g key={no}>
+              <circle cx={pos.x} cy={pos.y} r={16}
+                fill={fillNode} stroke={stroke} strokeWidth="1.5" opacity="0.5"
+              />
+              <text x={pos.x} y={pos.y + 1}
+                textAnchor="middle" dominantBaseline="middle"
+                fontSize={10} fontFamily="ui-monospace, monospace"
+                fill={textCol} opacity="0.7"
+              >
+                {no}
+              </text>
+            </g>
+          );
+        })}
       </svg>
-      <p className="text-center text-slate-500 text-xs font-mono mt-3">
-        aguardando cálculo...
+      <p className="text-center text-slate-600 text-xs font-mono">
+        selecione origem e destino, clique em Calcular rota
       </p>
     </div>
   );

@@ -72,10 +72,10 @@ describe("BuscaHashVisual", () => {
     expect(document.querySelector('[data-destaque="bucket:1"]')).not.toBeNull();
   });
 
-  it("mantém o resumo de comparação linear vs hash visível", () => {
+  it("exibe as duas fases (inserindo e buscando) no cabeçalho do player", () => {
     render(<BuscaHashVisual passos={PASSOS} resumo={RESUMO} chave="q" />);
 
-    expect(screen.getByText(/Busca Linear/i)).toBeInTheDocument();
-    expect(screen.getByText(/Hash Table/i)).toBeInTheDocument();
+    expect(screen.getByText(/fase 1/i)).toBeInTheDocument();
+    expect(screen.getByText(/fase 2/i)).toBeInTheDocument();
   });
 });
