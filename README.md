@@ -2,6 +2,8 @@
 
 Site educacional com 7 mini-projetos interativos que mostram estruturas de dados clássicas resolvendo problemas reais — conectadas às disciplinas onde elas reaparecem com outros nomes.
 
+**Demo:** [encaixe-ed.vercel.app](https://encaixe-ed.vercel.app)
+
 ---
 
 ## Pré-requisitos
