@@ -32,22 +32,32 @@ export default function SobrePage() {
         <h2 className="text-lg font-semibold text-white">Motivação</h2>
         <div className="text-slate-400 leading-relaxed space-y-3 text-sm">
           <p>
-            Estruturas de dados aparecem na graduação em Programação I, voltam em Algoritmos,
-            ressurgem em Sistemas Operacionais com outro nome, e de novo em Redes, em Banco de
-            Dados, em Compiladores. O problema é que raramente alguém aponta o fio que conecta
-            tudo isso.
+            A ideia surgiu durante a leitura do livro{" "}
+            <span className="text-white font-medium">Entendendo Estruturas de Dados</span>,
+            de Marcello La Rocca. À medida que ia lendo, percebia que cada estrutura
+            não era um conceito isolado — ela já tinha aparecido em outra disciplina com
+            outro nome, ou ia aparecer em breve em outra ainda.
           </p>
           <p>
-            Cada projeto aqui mostra a mesma coisa: a estrutura em ação, num problema real, com
-            a conexão explícita para a disciplina onde ela vai aparecer novamente.
+            O site nasceu com um propósito simples: ter um lugar para voltar e lembrar
+            onde vi cada conceito pela primeira vez, ver a estrutura funcionando de verdade
+            e entender em qual contexto real ela se encaixa. Menos referência técnica,
+            mais âncora de memória.
+          </p>
+          <p>
+            Estruturas de dados aparecem na graduação em Programação I, voltam em
+            Algoritmos, ressurgem em Sistemas Operacionais com outro nome, e de novo em
+            Redes, em Banco de Dados, em Compiladores. O problema é que raramente alguém
+            aponta o fio que conecta tudo isso — e esse fio é o que cada projeto aqui
+            tenta deixar explícito.
           </p>
         </div>
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-white">Referência</h2>
+        <h2 className="text-lg font-semibold text-white">Origem</h2>
         <div className="rounded-lg border border-slate-800 bg-[#161b27] px-5 py-4 flex items-start gap-4">
-          <div className="shrink-0 w-10 h-12 rounded bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-lg font-serif">
+          <div className="shrink-0 w-10 h-14 rounded bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-xl">
             📖
           </div>
           <div>
@@ -56,8 +66,9 @@ export default function SobrePage() {
             </p>
             <p className="text-slate-400 text-sm mt-0.5">Marcello La Rocca</p>
             <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-              Os 7 mini-projetos deste site correspondem às estruturas cobertas no livro,
-              mostrando as mesmas implementações em contextos práticos ligados à graduação.
+              Os 7 mini-projetos deste site correspondem diretamente às estruturas cobertas
+              no livro. A leitura foi o gatilho — cada capítulo gerou um projeto, cada
+              projeto gerou uma conexão com alguma disciplina da engenharia.
             </p>
           </div>
         </div>
@@ -116,7 +127,7 @@ export default function SobrePage() {
 
       <section className="border-t border-slate-800 pt-8 text-center space-y-3">
         <p className="text-slate-500 text-sm">
-          Projeto desenvolvido durante a graduação em Ciência da Computação na UFU.
+          Projeto desenvolvido durante a graduação em Engenharia de Computação na UFU.
         </p>
         <Link
           href="/projetos"
