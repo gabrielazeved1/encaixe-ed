@@ -98,6 +98,8 @@ export function GrausSeparacaoDemo() {
 
       {resultado ? (
         <GrausSeparacaoVisual
+          pessoas={pessoas}
+          amizades={amizades}
           caminho={resultado.caminho}
           graus={resultado.graus}
           niveis={resultado.niveis}

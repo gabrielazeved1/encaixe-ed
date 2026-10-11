@@ -6,8 +6,15 @@ class EntradaSerializer(serializers.Serializer):
     valor = serializers.CharField(max_length=200)
 
 
+_LINGUAGENS = [
+    "python", "java", "javascript", "typescript", "rust",
+    "go", "swift", "kotlin", "ruby", "php",
+    "c", "cpp", "scala", "haskell", "elixir", "dart",
+]
+
 DADOS_PADRAO: list[dict[str, str]] = [
-    {"chave": f"registro_{i:03d}", "valor": f"valor_{i}"} for i in range(1, 21)
+    {"chave": lang, "valor": f"linguagem #{i + 1}"}
+    for i, lang in enumerate(_LINGUAGENS)
 ]
 
 

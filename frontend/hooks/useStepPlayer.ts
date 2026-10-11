@@ -10,6 +10,7 @@ export type UseStepPlayerResult<E> = {
   avancar: () => void;
   voltar: () => void;
   resetar: () => void;
+  irPara: (i: number) => void;
   podeAvancar: boolean;
   podeVoltar: boolean;
   tocando: boolean;
@@ -21,15 +22,15 @@ export type UseStepPlayerResult<E> = {
 
 const INTERVALO_BASE_MS = 800;
 
-export function useStepPlayer<E>(passos: Passo<E>[]): UseStepPlayerResult<E> {
-  const [indice, setIndice] = useState(0);
+export function useStepPlayer<E>(passos: Passo<E>[], indiceInicial = 0): UseStepPlayerResult<E> {
+  const [indice, setIndice] = useState(indiceInicial);
   const [tocando, setTocando] = useState(false);
   const [velocidade, setVelocidade] = useState(1);
 
   useEffect(() => {
-    setIndice(0);
+    setIndice(indiceInicial);
     setTocando(false);
-  }, [passos]);
+  }, [passos, indiceInicial]);
 
   const total = passos.length;
   const podeAvancar = indice < total - 1;
@@ -44,9 +45,17 @@ export function useStepPlayer<E>(passos: Passo<E>[]): UseStepPlayerResult<E> {
   }, []);
 
   const resetar = useCallback(() => {
-    setIndice(0);
+    setIndice(indiceInicial);
     setTocando(false);
-  }, []);
+  }, [indiceInicial]);
+
+  const irPara = useCallback(
+    (i: number) => {
+      setIndice(Math.max(0, Math.min(i, passos.length - 1)));
+      setTocando(false);
+    },
+    [passos.length]
+  );
 
   const tocar = useCallback(() => {
     if (passos.length > 0) setTocando(true);
@@ -74,6 +83,7 @@ export function useStepPlayer<E>(passos: Passo<E>[]): UseStepPlayerResult<E> {
     avancar,
     voltar,
     resetar,
+    irPara,
     podeAvancar,
     podeVoltar,
     tocando,

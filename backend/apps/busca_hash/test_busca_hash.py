@@ -11,7 +11,7 @@ def client() -> Client:
 def test_busca_retorna_200_com_comparacoes(client: Client) -> None:
     res = client.post(
         "/api/hash/comparar/",
-        data=json.dumps({"chave": "registro_010"}),
+        data=json.dumps({"chave": "python"}),
         content_type="application/json",
     )
     assert res.status_code == 200
@@ -24,7 +24,7 @@ def test_busca_retorna_200_com_comparacoes(client: Client) -> None:
 def test_hash_usa_menos_comparacoes_que_linear(client: Client) -> None:
     res = client.post(
         "/api/hash/comparar/",
-        data=json.dumps({"chave": "registro_015"}),
+        data=json.dumps({"chave": "kotlin"}),
         content_type="application/json",
     )
     assert res.status_code == 200
