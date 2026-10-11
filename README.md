@@ -2,7 +2,7 @@
 
 > Estruturas de dados clássicas rodando de verdade — 7 mini-projetos interativos que mostram onde cada estrutura aparece nas disciplinas do curso de engenharia.
 
-**Demo:** [encaixe-ed.vercel.app](https://encaixe-ed.vercel.app)
+**Demo:** [encaixe-ed.vercel.app](https://encaixe-ed-omega.vercel.app)
 
 ---
 
