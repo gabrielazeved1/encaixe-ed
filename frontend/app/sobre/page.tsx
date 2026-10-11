@@ -34,22 +34,21 @@ export default function SobrePage() {
           <p>
             A ideia surgiu durante a leitura do livro{" "}
             <span className="text-white font-medium">Entendendo Estruturas de Dados</span>,
-            de Marcello La Rocca. À medida que ia lendo, percebia que cada estrutura
-            não era um conceito isolado — ela já tinha aparecido em outra disciplina com
-            outro nome, ou ia aparecer em breve em outra ainda.
+            de Marcello La Rocca — no último semestre da graduação em Engenharia de
+            Computação. Não foi trabalho de faculdade, não tinha nota. Foi curiosidade
+            mesmo: vontade de programar algo e ver o que saía.
           </p>
           <p>
-            O site nasceu com um propósito simples: ter um lugar para voltar e lembrar
-            onde vi cada conceito pela primeira vez, ver a estrutura funcionando de verdade
-            e entender em qual contexto real ela se encaixa. Menos referência técnica,
-            mais âncora de memória.
+            Ao longo da graduação, estruturas de dados aparecem em Programação I, voltam
+            em Algoritmos com outro nome, ressurgem em Sistemas Operacionais, em Redes,
+            em Banco de Dados. O problema é que raramente alguém aponta o fio que conecta
+            tudo isso. Você estuda pilha numa disciplina e usa call stack em outra sem
+            perceber que é a mesma coisa.
           </p>
           <p>
-            Estruturas de dados aparecem na graduação em Programação I, voltam em
-            Algoritmos, ressurgem em Sistemas Operacionais com outro nome, e de novo em
-            Redes, em Banco de Dados, em Compiladores. O problema é que raramente alguém
-            aponta o fio que conecta tudo isso — e esse fio é o que cada projeto aqui
-            tenta deixar explícito.
+            Se este site ajudar pelo menos um aluno a enxergar que entender o conceito
+            por baixo vale mais do que decorar a sintaxe, já cumpriu o propósito. Os
+            fundamentos aparecem de novo — sempre. Só muda o contexto.
           </p>
         </div>
       </section>
@@ -127,7 +126,8 @@ export default function SobrePage() {
 
       <section className="border-t border-slate-800 pt-8 text-center space-y-3">
         <p className="text-slate-500 text-sm">
-          Projeto desenvolvido durante a graduação em Engenharia de Computação na UFU.
+          Último semestre de Engenharia de Computação na UFU — feito por curiosidade,
+          sem nota, sem prazo.
         </p>
         <Link
           href="/projetos"
