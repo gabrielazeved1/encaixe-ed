@@ -48,12 +48,32 @@ export function AlocadorMemoriaDemo() {
       : ESTADO_INICIAL;
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6">
-      <h2 className="text-base font-semibold text-white mb-5">
-        Demonstração interativa
-      </h2>
+    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6 space-y-5">
+      <div>
+        <h2 className="text-base font-semibold text-white mb-3">
+          Demonstração interativa
+        </h2>
+        <div className="rounded-lg border border-cyan-500/20 bg-cyan-900/10 px-4 py-3 text-xs text-slate-300 leading-relaxed space-y-1">
+          <p>
+            <span className="text-cyan-300 font-semibold">Como funciona:</span>{" "}
+            você tem <span className="text-white">512 bytes</span> de memória
+            como uma régua. Ao alocar, o alocador percorre a{" "}
+            <span className="text-white">lista encadeada de blocos livres</span>{" "}
+            e pega o primeiro espaço grande o suficiente (estratégia{" "}
+            <span className="text-white">first-fit</span>), dividindo o bloco em
+            dois: um usado e um livre menor.
+          </p>
+          <p>
+            Ao liberar, o bloco volta à lista e blocos adjacentes livres são
+            fundidos (<span className="text-white">coalescing</span>). A{" "}
+            <span className="text-cyan-300">fragmentação</span> sobe quando os
+            blocos livres ficam espalhados e pequenos demais para novas
+            alocações maiores — mesmo com memória total disponível.
+          </p>
+        </div>
+      </div>
 
-      <div className="space-y-3 mb-6">
+      <div className="space-y-3">
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => alocar(64)}
@@ -108,7 +128,7 @@ export function AlocadorMemoriaDemo() {
         </div>
       </div>
 
-      {erro && <p className="text-red-400 text-sm mb-4">{erro}</p>}
+      {erro && <p className="text-red-400 text-sm">{erro}</p>}
 
       <AlocadorMemoriaVisual estado={estadoAtual} />
 

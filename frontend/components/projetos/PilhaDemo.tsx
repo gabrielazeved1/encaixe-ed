@@ -21,12 +21,33 @@ export function PilhaDemo() {
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6">
-      <h2 className="mb-5 text-base font-semibold text-white">
-        Demonstração interativa
-      </h2>
+    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6 space-y-5">
+      <div>
+        <h2 className="text-base font-semibold text-white mb-3">
+          Demonstração interativa
+        </h2>
+        <div className="rounded-lg border border-blue-500/20 bg-blue-900/10 px-4 py-3 text-xs text-slate-300 leading-relaxed space-y-1">
+          <p>
+            <span className="text-blue-300 font-semibold">Como funciona:</span>{" "}
+            cada vez que uma função chama outra, um{" "}
+            <span className="text-white">frame</span> é{" "}
+            <span className="text-blue-300">empilhado</span> (push) com o nome
+            e o argumento. Quando a função retorna, o frame é{" "}
+            <span className="text-blue-300">desempilhado</span> (pop) com o
+            resultado. Funções recursivas se chamam repetidamente — cada chamada
+            empilha mais um frame.
+          </p>
+          <p>
+            Se a recursão for funda demais (tente{" "}
+            <span className="text-white font-mono">fibonacci(51)</span>
+            ), a pilha estoura — é o{" "}
+            <span className="text-white">stack overflow</span>. Limite aqui: 50
+            frames.
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="mb-6 space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div className="flex items-center gap-2 px-0.5">
           <span className="w-36 font-mono text-xs text-slate-500">função</span>
           <span className="font-mono text-xs text-slate-500">
@@ -65,7 +86,7 @@ export function PilhaDemo() {
         </div>
       </form>
 
-      {erro && <p className="mb-4 text-sm text-red-400">{erro}</p>}
+      {erro && <p className="text-sm text-red-400">{erro}</p>}
 
       {resultado ? (
         <PilhaVisual passos={resultado.passos} />

@@ -22,12 +22,31 @@ export function IndiceBSTDemo() {
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6">
-      <h2 className="text-base font-semibold text-white mb-5">
-        Demonstração interativa
-      </h2>
+    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6 space-y-5">
+      <div>
+        <h2 className="text-base font-semibold text-white mb-3">
+          Demonstração interativa
+        </h2>
+        <div className="rounded-lg border border-teal-500/20 bg-teal-900/10 px-4 py-3 text-xs text-slate-300 leading-relaxed space-y-1">
+          <p>
+            <span className="text-teal-300 font-semibold">Como funciona:</span>{" "}
+            cada valor inserido desce pela árvore comparando com cada nó —{" "}
+            <span className="text-white">menor vai à esquerda</span>,{" "}
+            <span className="text-white">maior vai à direita</span>. A busca
+            segue o mesmo caminho: a cada comparação, metade da árvore é
+            descartada — O(log n) esperado.
+          </p>
+          <p>
+            <span className="text-teal-300 font-semibold">Atenção à ordem:</span>{" "}
+            os mesmos números em ordens diferentes geram árvores completamente
+            diferentes. Insira{" "}
+            <span className="text-white font-mono">1,2,3,4,5,6,7</span> para ver
+            a árvore degenerada (vira lista) onde a busca passa a custar O(n).
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 mb-6">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label className="block text-xs font-mono text-slate-400 mb-1">
             Valores para inserir{" "}

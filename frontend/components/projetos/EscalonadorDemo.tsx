@@ -60,12 +60,31 @@ export function EscalonadorDemo() {
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6">
-      <h2 className="text-base font-semibold text-white mb-5">
-        Demonstração interativa
-      </h2>
+    <div className="rounded-xl border border-slate-700 bg-[#161b27] p-6 space-y-5">
+      <div>
+        <h2 className="text-base font-semibold text-white mb-3">
+          Demonstração interativa
+        </h2>
+        <div className="rounded-lg border border-green-500/20 bg-green-900/10 px-4 py-3 text-xs text-slate-300 leading-relaxed space-y-1">
+          <p>
+            <span className="text-green-300 font-semibold">Round-Robin:</span>{" "}
+            cada processo recebe uma fatia de tempo igual (o{" "}
+            <span className="text-white">quantum</span>). Se não terminou,
+            volta para o fim da fila. Justo, mas sem noção de urgência — um
+            processo crítico espera na fila igual a um de baixa prioridade.
+          </p>
+          <p>
+            <span className="text-green-300 font-semibold">Prioridade:</span>{" "}
+            usa um{" "}
+            <span className="text-white">heap mínimo</span> — o processo com
+            menor número de prioridade (1 = mais urgente) é sempre executado
+            primeiro, independente de quando chegou. Processos de baixa
+            prioridade podem aguardar enquanto houver algo urgente.
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1">
           <div className="flex gap-2 items-center px-0.5">
             <span className="w-20 text-xs font-mono text-slate-500">nome</span>
@@ -157,7 +176,7 @@ export function EscalonadorDemo() {
         </div>
       </form>
 
-      {erro && <p className="text-red-400 text-sm mb-4">{erro}</p>}
+      {erro && <p className="text-red-400 text-sm">{erro}</p>}
 
       {resultado ? (
         <EscalonadorVisual
