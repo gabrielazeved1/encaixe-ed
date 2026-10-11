@@ -61,21 +61,29 @@ export function BuscaHashDemo() {
       </div>
 
       <div>
-        <p className="text-xs font-mono text-slate-500 mb-2">
-          16 linguagens armazenadas · clique para buscar:
+        <p className="text-xs font-mono text-slate-500 mb-1">
+          16 linguagens armazenadas na ordem abaixo · clique para buscar:
+        </p>
+        <p className="text-[10px] font-mono text-slate-600 mb-2">
+          o número à esquerda é a posição na lista (busca linear percorre nessa ordem)
         </p>
         <div className="flex flex-wrap gap-1.5">
-          {LINGUAGENS.map((l) => {
+          {LINGUAGENS.map((l, i) => {
             const bucket = computeHash(l.chave);
+            const pos = i + 1;
+            const selecionada = chave === l.chave;
             return (
               <button key={l.chave} type="button" onClick={() => setChave(l.chave)}
-                title={`bucket [${bucket}]`}
-                className={`rounded px-2 py-0.5 text-xs font-mono transition-colors ${
-                  chave === l.chave
+                title={`posição ${pos} na lista · bucket [${bucket}] na hash table`}
+                className={`rounded text-xs font-mono transition-colors flex items-center gap-1 px-1.5 py-0.5 ${
+                  selecionada
                     ? "bg-orange-500/30 border border-orange-400/60 text-orange-200"
                     : "bg-slate-800 border border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200"
                 }`}
               >
+                <span className={`text-[9px] w-4 text-right shrink-0 ${selecionada ? "text-orange-400" : "text-slate-600"}`}>
+                  {pos}.
+                </span>
                 {l.chave}
               </button>
             );
