@@ -66,8 +66,7 @@ export default function SobrePage() {
             <p className="text-slate-400 text-sm mt-0.5">Marcello La Rocca</p>
             <p className="text-slate-500 text-xs mt-2 leading-relaxed">
               Os 7 mini-projetos deste site correspondem diretamente às estruturas cobertas
-              no livro. A leitura foi o gatilho — cada capítulo gerou um projeto, cada
-              projeto gerou uma conexão com alguma disciplina da engenharia.
+              no livro.
             </p>
           </div>
         </div>

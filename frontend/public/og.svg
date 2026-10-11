@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0d1117"/>
+
+  <!-- grid lines decorativas -->
+  <line x1="0" y1="210" x2="1200" y2="210" stroke="#161b27" stroke-width="1"/>
+  <line x1="0" y1="420" x2="1200" y2="420" stroke="#161b27" stroke-width="1"/>
+  <line x1="400" y1="0" x2="400" y2="630" stroke="#161b27" stroke-width="1"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#161b27" stroke-width="1"/>
+
+  <!-- logo E -->
+  <rect x="80" y="215" width="80" height="80" rx="14" fill="#2563eb"/>
+  <text x="120" y="273" font-family="ui-sans-serif, system-ui, sans-serif" font-size="48" font-weight="700" fill="white" text-anchor="middle">E</text>
+
+  <!-- nome -->
+  <text x="184" y="268" font-family="ui-sans-serif, system-ui, sans-serif" font-size="52" font-weight="700" fill="white">Encaixe</text>
+
+  <!-- tagline -->
+  <text x="80" y="340" font-family="ui-sans-serif, system-ui, sans-serif" font-size="26" fill="#94a3b8">Estruturas de Dados em Ação</text>
+
+  <!-- divisor -->
+  <line x1="80" y1="375" x2="520" y2="375" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- projetos lista -->
+  <text x="80" y="410" font-family="ui-monospace, monospace" font-size="15" fill="#3b82f6">pilha</text>
+  <text x="80" y="434" font-family="ui-monospace, monospace" font-size="15" fill="#3b82f6">escalonador</text>
+  <text x="80" y="458" font-family="ui-monospace, monospace" font-size="15" fill="#3b82f6">roteamento</text>
+  <text x="80" y="482" font-family="ui-monospace, monospace" font-size="15" fill="#3b82f6">graus-de-separacao</text>
+  <text x="280" y="410" font-family="ui-monospace, monospace" font-size="15" fill="#3b82f6">busca-hash</text>
+  <text x="280" y="434" font-family="ui-monospace, monospace" font-size="15" fill="#3b82f6">indice-bst</text>
+  <text x="280" y="458" font-family="ui-monospace, monospace" font-size="15" fill="#3b82f6">alocador-memoria</text>
+
+  <!-- decoração direita — nó de grafo -->
+  <circle cx="920" cy="220" r="36" fill="none" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="920" y="228" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="600" fill="#60a5fa" text-anchor="middle">A</text>
+
+  <circle cx="780" cy="340" r="30" fill="none" stroke="#1e3a5f" stroke-width="2"/>
+  <text x="780" y="348" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="600" fill="#475569" text-anchor="middle">B</text>
+
+  <circle cx="1060" cy="340" r="30" fill="none" stroke="#1e3a5f" stroke-width="2"/>
+  <text x="1060" y="348" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="600" fill="#475569" text-anchor="middle">C</text>
+
+  <circle cx="920" cy="450" r="28" fill="none" stroke="#1e3a5f" stroke-width="2"/>
+  <text x="920" y="458" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="600" fill="#475569" text-anchor="middle">D</text>
+
+  <line x1="889" y1="248" x2="806" y2="313" stroke="#1d4ed8" stroke-width="1.5"/>
+  <line x1="951" y1="248" x2="1034" y2="313" stroke="#1e3a5f" stroke-width="1.5"/>
+  <line x1="800" y1="369" x2="900" y2="424" stroke="#1e3a5f" stroke-width="1.5"/>
+  <line x1="1042" y1="367" x2="944" y2="424" stroke="#1e3a5f" stroke-width="1.5"/>
+
+  <!-- pesos -->
+  <text x="836" y="290" font-family="ui-monospace, monospace" font-size="13" fill="#3b82f6">1</text>
+  <text x="994" y="290" font-family="ui-monospace, monospace" font-size="13" fill="#475569">4</text>
+  <text x="843" y="405" font-family="ui-monospace, monospace" font-size="13" fill="#475569">2</text>
+  <text x="990" y="405" font-family="ui-monospace, monospace" font-size="13" fill="#475569">3</text>
+</svg>

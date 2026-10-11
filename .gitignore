@@ -48,5 +48,6 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Spec Kit (drafts locais que não devem ir pro repo)
-.specify/memory/.draft-*
+# Spec Kit e Claude Code (tooling local — não vai pro repo)
+.specify/
+.claude/
