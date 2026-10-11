@@ -68,7 +68,7 @@ export function GrausSeparacaoDemo() {
           Por explorar por camadas, o BFS{" "}
           <span className="text-indigo-300">garante matematicamente</span> que o
           primeiro caminho até o destino é sempre o de menor número de saltos —
-          exatamente o que o LinkedIn chama de "2º grau" ou "3º grau".
+          exatamente o que o LinkedIn chama de &ldquo;2º grau&rdquo; ou &ldquo;3º grau&rdquo;.
         </p>
       </div>
 

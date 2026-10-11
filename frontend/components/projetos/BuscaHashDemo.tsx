@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { useBuscaHash } from "@/hooks/useBuscaHash";
-import { BuscaHashVisual } from "@/components/projetos/BuscaHashVisual";
 import type { EntradaHash } from "@/lib/api";
 
 const LINGUAGENS: EntradaHash[] = [
@@ -158,7 +157,6 @@ function TabelaHashPreview({
       <div className="grid grid-cols-8 gap-1">
         {buckets.map((bucket, idx) => {
           const alvo = bucketAlvo === idx;
-          const temChaveAlvo = bucket.some(([k]) => k === chaveAlvo);
           return (
             <div key={idx}
               className={`flex min-h-[3.5rem] flex-col rounded border text-[9px] font-mono transition-all duration-200 overflow-hidden ${
@@ -220,7 +218,6 @@ function BuscaLinearVisual({ chave, comparacoes, encontrado }: {
           const posicao = i + 1;
           const eAlvo = item === chave;
           const foiVerificado = posicao <= comparacoes;
-          const eNaoEncontrado = foiVerificado && !eAlvo && !encontrado;
 
           if (!foiVerificado) {
             return (

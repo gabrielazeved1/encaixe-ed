@@ -74,7 +74,7 @@ function GridBuckets({
   );
 }
 
-export function BuscaHashVisual({ passos, resumo: _resumo, chave: _chave }: Props) {
+export function BuscaHashVisual({ passos }: Props) {
   const primeiroPassoBusca = useMemo(
     () => passos.findIndex((p) => p.descricao.startsWith("Buscando")),
     [passos]
