@@ -174,6 +174,13 @@ export function RoteamentoVisual({
   const [passo, setPasso] = useState(0);
   const posicoes = useMemo(() => calcularPosicoes(nos), [nos]);
 
+  // O backend mistura passos de visita {no, custo_acumulado, via} com passos de
+  // relaxamento {tipo:"relaxamento"}. Filtramos apenas as visitas de nó.
+  const passosVisita = useMemo(
+    () => passos.filter((p): p is PassoDijkstra => typeof (p as PassoDijkstra).no === "string"),
+    [passos]
+  );
+
   if (caminho.length === 0 || custoTotal < 0) {
     return (
       <div className="rounded-lg bg-red-900/20 border border-red-500/40 px-4 py-3 text-center text-red-300 font-mono text-sm">
@@ -182,10 +189,10 @@ export function RoteamentoVisual({
     );
   }
 
-  const totalPassos = passos.length;
+  const totalPassos = passosVisita.length;
   const passoFinal = passo >= totalPassos;
-  const passosVisiveis = passoFinal ? passos : passos.slice(0, passo + 1);
-  const passoAtual = passoFinal ? null : (passos[passo] ?? null);
+  const passosVisiveis = passoFinal ? passosVisita : passosVisita.slice(0, passo + 1);
+  const passoAtual = passoFinal ? null : (passosVisita[passo] ?? null);
   const podeAvancar = passo < totalPassos;
   const podeVoltar = passo > 0;
 
@@ -289,7 +296,7 @@ export function RoteamentoVisual({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
-              {passos.map((p, i) => {
+              {passosVisita.map((p, i) => {
                 const emCaminho = caminho.includes(p.no);
                 return (
                   <tr key={i} className={emCaminho ? "bg-purple-900/10" : ""}>
